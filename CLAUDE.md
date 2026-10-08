@@ -5,8 +5,45 @@ Contém as regras de automação e convenções do projeto Kurio.
 
 ## Projeto
 
-Frontend em React 19 + TypeScript + Vite, com React Router e Tailwind CSS v4.
-Detalhes de stack, scripts e estrutura de pastas estão no [README.md](README.md).
+Kurio é a solução do **Desafio Frontend — Marketplace de NFTs** (Jungle Gaming).
+O enunciado completo é a fonte da verdade e está em [docs/DESAFIO.md](docs/DESAFIO.md)
+(original: https://github.com/junglegaming/frontend-challenge). Consulte-o antes de
+implementar qualquer tela, fluxo, contrato ou teste.
+
+Layout de referência: [Figma](https://www.figma.com/design/Ff0SksUi7UFtPWUO8kyNtw/Frontend-Challenge?node-id=0-1).
+
+### Stack obrigatória (não substituir)
+
+| Responsabilidade | Tecnologia |
+| --- | --- |
+| Interface / linguagem | React + TypeScript (build com Vite) |
+| Roteamento | TanStack Router (inclusive search params e rotas protegidas) |
+| Estado remoto | TanStack Query (consultas, mutations, cache) |
+| Cliente HTTP | Axios (toda chamada REST passa por ele) |
+| Tempo real | Socket.IO (`socket.io-client`) |
+| Estilização / componentes | Tailwind CSS + shadcn/ui |
+| Mocking | MSW (REST + Socket.IO via `@mswjs/socket.io-binding`) |
+| Testes | Playwright (E2E + regressão visual) |
+| Auditoria | Lighthouse |
+
+### Regras que valem para todo o código
+
+- **Sem dados fictícios fora do MSW**: componentes, hooks e o cliente Axios nunca contêm
+  respostas mockadas nem caminhos alternativos de negócio. Mocks ficam só na camada de rede.
+- **Eventos de tempo real sempre via `socket.io-client`**, nunca chamando setters/cache direto
+  para "simular" eventos.
+- **Valores em ETH são strings decimais**; cálculos com precisão (nada de `number` float).
+  Quantidades são inteiras.
+- **Estado de busca/filtros/ordenação/paginação na URL** (search params do TanStack Router).
+- **Contratos tipados** entre transporte, estado e UI; estados de loading (skeleton com
+  shimmer), vazio, erro, sucesso e atualização em segundo plano em toda tela com dados.
+- **Acessibilidade**: teclado, foco visível, foco preso em diálogos/drawers, labels e erros
+  associados aos campos, `alt` em imagens, respeito a `prefers-reduced-motion`.
+- **Responsivo** em 390, 768 e 1440 px, sem overflow horizontal.
+- **Isolamento por usuário**: logout/troca de usuário limpa cache privado e subscriptions.
+- Pedidos usam **chave de idempotência**; nunca permitir pedido duplicado.
+- Toda decisão de arquitetura, desvio do Figma ou limitação vai para `ARCHITECTURE.md`;
+  setup, credenciais fictícias, cenários e comandos vão para o `README.md`.
 
 ## Automações
 
@@ -17,6 +54,7 @@ Sempre que uma instrução/task do usuário for concluída e houver alterações
 1. Validar antes de commitar:
    - `npm run build` (type-check + build) deve passar
    - `npm run lint` deve passar sem erros
+   - Testes Playwright relacionados à área alterada devem passar (quando existirem)
    - Se falhar, corrigir; se não for possível corrigir, **não** commitar e informar o usuário.
 2. Revisar `git status` / `git diff` e adicionar somente os arquivos relacionados à task
    (nunca commitar `.env`, credenciais ou arquivos gerados como `dist/` e `node_modules/`).
