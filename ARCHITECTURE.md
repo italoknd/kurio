@@ -78,6 +78,44 @@ API (ex.: 2×1.19 + 6×1.39 + 9×1.79 + 0.016 = `26.846`).
 `['cart', userId | null]`. Logout e troca de usuário removem esses prefixos de uma vez; o
 catálogo (`['nfts', …]`) é público e permanece.
 
+## Sessão
+
+| Aspecto | Comportamento |
+| --- | --- |
+| Persistência | Token em localStorage (`kurio:session-token`); a sessão é revalidada em `GET /auth/session` ao carregar a aplicação |
+| Rotas privadas | `staticData.requiresAuth` + `beforeLoad: requireAuth` (perfil, carteiras, favoritos, pagamento, pedidos) |
+| Revalidação | Toda navegação para rota privada consulta `/auth/session` com uma requisição própria |
+| Expiração | Detectada por 401 em qualquer chamada autenticada, pela guarda de rota ou pelo `expiresAt` no cliente |
+| Ao expirar | Remove token e cache privado, avisa (toast) e leva a `/entrar?redirect=<destino>&motivo=expirada` |
+| Retorno ao fluxo | Após login/cadastro, volta para `redirect` (apenas caminhos internos, nunca /entrar ou /cadastro) |
+| Logout | `POST /auth/logout` (melhor esforço) + limpeza do cliente, sempre |
+| Troca de usuário | `startSession` remove todo o cache privado antes de gravar a nova sessão |
+| Tempo real | O socket reconecta com o novo token a cada mudança de sessão; eventos privados da sessão anterior param |
+| Carrinho do visitante | Ao autenticar, `POST /cart/merge` junta os itens à conta; falha não bloqueia o login |
+
+**Login em modal × página.** No desktop, "Entrar" abre um modal sobre a página atual
+(parâmetro `?auth=entrar|cadastro`, então "voltar" fecha o modal e o usuário continua onde
+estava). No mobile, e em redirecionamentos de rotas privadas, `/entrar` e `/cadastro` são
+páginas cheias, como nos frames mobile.
+
+**Detalhes que evitaram bugs:**
+- A guarda não usa `fetchQuery`: uma consulta de sessão em andamento, iniciada antes da
+  expiração, seria reaproveitada e deixaria a navegação passar.
+- No *preload* (hover no link) a guarda só recusa; o aviso e o destino salvo vêm da
+  navegação real, para que o destino seja o link clicado.
+- O redirecionamento reativo (logout/expiração em rota privada) só olha o estado resolvido
+  do router; durante uma transição os matches ainda são da rota anterior, o que gerava
+  redirecionamentos em cadeia.
+- `mutateAsync` no "Sair": callbacks de `mutate()` não rodam se o componente desmonta.
+
+## Formulários
+
+react-hook-form + zod, com um adaptador próprio (`lib/forms.ts`) em vez de
+`@hookform/resolvers` (conflito de peer dependency com o zod usado pelo TanStack). As regras
+de validação espelham as da API para feedback imediato; erros por campo vindos da API
+(`fields`) são aplicados ao formulário e focam o primeiro campo inválido. Campos usam
+`TextField`, que associa rótulo, dica e erro via `aria-describedby` / `aria-invalid`.
+
 ## Mocks (MSW)
 
 - Ativados por `VITE_ENABLE_MOCKS` (padrão `true`), inclusive no build de produção usado na

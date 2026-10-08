@@ -1,6 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { PagePlaceholder } from '@/components/feedback/page-placeholder'
+import { AuthPage } from '@/features/auth/auth-page'
+import { validateAuthSearch } from '@/features/auth/guards'
 
 export const Route = createFileRoute('/entrar')({
-  component: () => <PagePlaceholder title="Entrar" frame="desktop-06-login.png" />,
+  validateSearch: validateAuthSearch,
+  staticData: { minimalMobileChrome: true },
+  component: LoginRoute,
 })
+
+function LoginRoute() {
+  const { redirect, motivo } = Route.useSearch()
+  return <AuthPage mode="entrar" redirect={redirect} motivo={motivo} />
+}

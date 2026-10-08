@@ -11,7 +11,7 @@ encontrados, como validar e os commits correspondentes.
 | 0 | Preparação (template, regras do agente, enunciado, Figma) | Concluída |
 | 1 | Fundação (stack obrigatória, tema, layout, mocks, Playwright) | Concluída |
 | 2 | Contratos e mocks (tipos, fixtures, handlers REST, eventos) | Concluída |
-| 3 | Conta e sessão | Pendente |
+| 3 | Conta e sessão | Concluída |
 | 4 | Catálogo e detalhe | Pendente |
 | 5 | Carrinho e cotação | Pendente |
 | 6 | Tempo real | Pendente |
@@ -113,3 +113,55 @@ completa, com estado consistente entre REST e eventos.
 custa metade), o que daria `0,01 – 6,15`; corrigido para o preço listado.
 
 **Validação:** `npm run build`, `npm run lint`, `npm run test:e2e` (27 testes passando).
+
+**Commit:** `3f72872`.
+
+---
+
+## Etapa 3 — Conta e sessão
+
+**Objetivo:** cadastro, login, logout e sessão recuperável, com proteção das rotas privadas,
+expiração tratada sem perder o contexto e isolamento entre usuários.
+
+**Entregue:**
+- **Login e cadastro** fiéis aos frames: modal sobre a página atual no desktop
+  (`?auth=entrar|cadastro`) e página cheia no mobile (`/entrar`, `/cadastro`), sem barra
+  inferior e rodapé no mobile, como no Figma.
+- **Validação** no cliente (zod, espelhando a API) e erros da API aplicados aos campos
+  (ex.: e-mail já cadastrado foca o campo); credencial incorreta exibida como alerta.
+- **Sessão recuperável** após refresh (token + revalidação em `/auth/session`).
+- **Rotas privadas** (perfil, carteiras, favoritos, pagamento, pedidos) com guarda que
+  revalida a sessão e leva ao login guardando o destino; após autenticar, volta para ele.
+- **Expiração** detectada por 401, pela guarda ou pelo `expiresAt`: limpa dados privados,
+  avisa e leva ao login com `motivo=expirada`, preservando o destino.
+- **Logout** pelo menu da conta (header) e pelo "Sair" do perfil; **troca de usuário** limpa
+  todo o cache privado; o Socket.IO reconecta com o token da nova sessão.
+- **Carrinho do visitante** juntado à conta ao autenticar.
+- Login social e "Esqueceu a senha?" avisam indisponibilidade (fora do escopo).
+- Testes E2E (`e2e/auth.spec.ts`), desktop e mobile: validação, credencial errada, refresh,
+  cadastro com conflito, rota privada, expiração durante a navegação, logout/troca de
+  usuário (verificando o usuário da conexão Socket.IO), foco preso no modal e Esc.
+
+**Decisões:**
+- `react-hook-form` + `zod` com adaptador próprio, evitando `@hookform/resolvers` (conflito
+  de peer dependency com o zod do TanStack).
+- Rótulos dos campos visualmente ocultos (o Figma usa só placeholder), mas presentes para
+  leitores de tela; o campo da newsletter passou a se chamar "E-mail para receber novidades"
+  para não ter o mesmo nome acessível do e-mail de login.
+- Foco inicial do modal no primeiro campo, e não na aba "Entrar".
+
+**Problemas encontrados:**
+- **Redirecionamento em cadeia** (`/entrar?redirect=/entrar?redirect=...`): o redirecionamento
+  reativo via matches da rota anterior durante a transição → passou a usar só o estado
+  resolvido, e `safeRedirect` recusa /entrar e /cadastro como destino.
+- **Expiração não detectada:** `fetchQuery` reaproveitava uma consulta de sessão iniciada
+  antes da expiração → a guarda faz uma requisição própria.
+- **Preload no hover** expirava a sessão antes do clique e salvava o destino errado → no
+  preload a guarda só recusa.
+- **Toast do logout não aparecia:** callback de `mutate()` não roda após desmontar →
+  `mutateAsync`.
+- Testes: a URL muda antes da guarda concluir e `/\/perfil$/` casava com `?redirect=/perfil`
+  → asserções comparam o `pathname` e esperam o conteúdo da página privada.
+
+**Validação:** `npm run build`, `npm run lint`, `npm run test:e2e` (38 testes; testes de
+sessão repetidos 5× sem falhas).

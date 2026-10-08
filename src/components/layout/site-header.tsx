@@ -1,5 +1,7 @@
 import { Link, useRouterState } from '@tanstack/react-router'
 import { LogIn, Search, ShoppingCart } from 'lucide-react'
+import { useSession } from '@/features/auth/session'
+import { UserMenu } from '@/features/auth/user-menu'
 import { cn } from '@/lib/utils'
 import { notifyUnavailable } from '@/lib/unavailable'
 
@@ -9,6 +11,7 @@ export function SiteHeader() {
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const isMarket = MARKET_PATHS.some((path) => pathname.startsWith(path))
   const isHome = pathname === '/'
+  const { user, isPending } = useSession()
 
   return (
     <header className="hidden md:block">
@@ -35,13 +38,20 @@ export function SiteHeader() {
           <Link to="/carrinho" aria-label="Carrinho" className="relative rounded-sm p-1 hover:text-primary">
             <ShoppingCart className="size-6" aria-hidden="true" />
           </Link>
-          <Link
-            to="/entrar"
-            className="inline-flex h-9 items-center gap-1 rounded-md bg-primary px-2.5 text-base font-medium text-primary-foreground hover:bg-primary-hover"
-          >
-            <LogIn className="size-5" aria-hidden="true" />
-            Entrar
-          </Link>
+          {isPending ? (
+            <span className="h-9 w-24" aria-hidden="true" />
+          ) : user ? (
+            <UserMenu user={user} />
+          ) : (
+            <Link
+              to="."
+              search={(prev) => ({ ...prev, auth: 'entrar' as const })}
+              className="inline-flex h-9 items-center gap-1 rounded-md bg-primary px-2.5 text-base font-medium text-primary-foreground hover:bg-primary-hover"
+            >
+              <LogIn className="size-5" aria-hidden="true" />
+              Entrar
+            </Link>
+          )}
         </div>
       </div>
     </header>

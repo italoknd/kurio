@@ -8,6 +8,7 @@ import {
   YoutubeIcon,
 } from '@/components/icons/brand-icons'
 import { notifyUnavailable } from '@/lib/unavailable'
+import { cn } from '@/lib/utils'
 
 const FEATURES = [
   {
@@ -37,14 +38,14 @@ const SOCIALS = [
 
 const COLLECTIONS = ['Arte digital', 'Fotografia', 'Música', 'Arte 3D', 'Utilidade']
 
-export function SiteFooter() {
+export function SiteFooter({ className }: { className?: string }) {
   function handleNewsletter(event: FormEvent) {
     event.preventDefault()
     notifyUnavailable('A newsletter')
   }
 
   return (
-    <footer className="mt-16 pb-20 md:mt-24 md:pb-0">
+    <footer className={cn('mt-16 pb-20 md:mt-24 md:pb-0', className)}>
       <div className="container-site">
         <section
           aria-label="Destaques da Kurio"
@@ -67,7 +68,7 @@ export function SiteFooter() {
             <h2 className="text-lg leading-4 font-bold">Antecipe-se ao próximo lançamento</h2>
             <div className="flex">
               <label htmlFor="newsletter-email" className="sr-only">
-                E-mail
+                E-mail para receber novidades
               </label>
               <input
                 id="newsletter-email"
