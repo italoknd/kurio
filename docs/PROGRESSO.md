@@ -13,7 +13,7 @@ encontrados, como validar e os commits correspondentes.
 | 2 | Contratos e mocks (tipos, fixtures, handlers REST, eventos) | Concluída |
 | 3 | Conta e sessão | Concluída |
 | 4 | Catálogo e detalhe | Concluída |
-| 5 | Carrinho e cotação | Pendente |
+| 5 | Carrinho e cotação | Concluída |
 | 6 | Tempo real | Pendente |
 | 7 | Checkout e pedido | Pendente |
 | 8 | Perfil e carteiras | Pendente |
@@ -221,3 +221,44 @@ na URL), detalhe do NFT com galeria, edições, quantidade, favoritos e compra.
 detalhe repetidos 3× sem falhas).
 
 **Commit:** `d89dca2`.
+
+---
+
+## Etapa 5 — Carrinho e cotação
+
+**Objetivo:** tela `/carrinho` (frames desktop-03 e mobile-03) com edição de quantidades,
+remoção, cupom e resumo calculado pela API, além dos testes do enunciado §9, item 5.
+
+**Entregue:**
+- **Lista de itens** com imagem, nome (link para o detalhe), ID do token, edição, preço
+  unitário, stepper de quantidade e total da linha; layout em tabela no desktop/tablet e em
+  cards no mobile.
+- **Quantidades** limitadas por `maxQuantity` (disponibilidade e limite por pedido), com
+  atualização otimista, requisições em série por item e recuperação em 409.
+- **Remoção com desfazer** (toast) e foco devolvido ao título.
+- **Cupom:** aplicar/remover, validação local (vazio) e erros da API no campo (inválido,
+  expirado), associados via `aria-describedby`.
+- **Resumo** (subtotal, desconto, taxa estimada da rede, total) vindo de `GET /cart/quote`,
+  com skeleton com shimmer e atualização em segundo plano (valores esmaecidos).
+- **Itens com problema** (`quote.issues`) destacados, com mensagem associada à linha;
+  "Conectar e finalizar" bloqueado com o motivo anunciado.
+- Estados de carregamento, erro com nova tentativa e **carrinho vazio** com link ao catálogo.
+- **"Colecionadores também viram"** (aba "Em alta" do catálogo).
+- "Conectar e finalizar" leva ao pagamento (visitante passa pelo login e volta).
+- Testes E2E: `e2e/cart.spec.ts` (7 cenários × desktop e mobile).
+
+**Decisões:** ver "Carrinho e cotação" e os desvios do carrinho em `ARCHITECTURE.md` (cotação
+na rede Ethereum até o pagamento, desfazer em vez de diálogo, coluna "Quantidade").
+
+**Problemas encontrados:**
+- **Navegador do Playwright ausente** após a atualização das dependências → `npx playwright
+  install chromium`.
+- **Testes lentos com muitos workers:** a primeira renderização após um carregamento completo
+  passava de 5 s no desktop em paralelo → espera própria de 15 s só no carregamento inicial.
+- **Junção do carrinho interrompida no teste:** recarregar a página logo após o login
+  cancelava o `POST /cart/merge` → o teste volta ao carrinho por navegação interna.
+- **Nomes truncados no mobile** (390 px) → fonte e imagem menores na linha.
+
+**Validação:** `npm run build`, `npm run lint`, `npm run test:e2e`.
+
+**Commit:** (preenchido no próximo commit).

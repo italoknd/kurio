@@ -133,6 +133,30 @@ ou remove o id), e não restaura um snapshot: se o clique acontece enquanto a li
 carrega, o snapshot seria vazio e `setQueryData(undefined)` é ignorado pelo TanStack Query v5
 — bug real encontrado pelo teste de falha. Visitantes são levados ao modal de login.
 
+## Carrinho e cotação
+
+- **Fonte da verdade é a API:** toda mutation do carrinho (`PATCH`/`DELETE` de itens, cupom,
+  inclusão) devolve o carrinho completo, gravado direto no cache (`['cart', userId]`), e
+  invalida as cotações (`['cart', userId, 'quote', rede]`). Subtotal, desconto, taxa e total
+  vêm sempre de `GET /cart/quote`; o cliente só multiplica preço × quantidade para exibir o
+  total da linha durante a atualização otimista (com `mulEth`, sem ponto flutuante).
+- **Quantidade otimista e em série:** o stepper muda o número na hora; as requisições do mesmo
+  item usam `scope` do TanStack Query (rodam na ordem dos cliques) e só a última resposta é
+  gravada, para respostas intermediárias não fazerem o número "voltar". Em erro (ex.: 409 de
+  disponibilidade) o carrinho é recarregado da API e o motivo aparece em um toast.
+- **Cotação na tela:** usa a rede Ethereum até o pagamento (onde a rede é escolhida), como no
+  Figma. Com `keepPreviousData`, a cotação anterior fica visível e esmaecida enquanto a nova
+  carrega. "Conectar e finalizar" fica desabilitado sem cotação atual, durante alterações,
+  em erro ou com `quote.issues`; o motivo é anunciado (`aria-live`).
+- **Problemas de disponibilidade** (`quote.issues`) destacam a linha, associam a mensagem ao
+  item (`aria-describedby`) e bloqueiam a finalização até o item ser ajustado ou removido.
+- **Remoção com desfazer:** sem diálogo de confirmação; o toast oferece "Desfazer", que
+  reinclui o item com a mesma edição e quantidade. O foco vai para o título da página, pois o
+  botão removido sai do DOM.
+- **Visitante:** o id do carrinho anônimo fica em localStorage (header `X-Cart-Id`) e é
+  juntado ao carrinho da conta no login (`POST /cart/merge`). "Conectar e finalizar" leva a
+  `/pagamento`; a rota privada manda o visitante ao login com retorno ao pagamento.
+
 ## Callbacks de mutation e desmontagem
 
 Ações que levam a outra página (login na página cheia, "Sair", comprar) colocam efeitos
@@ -206,6 +230,14 @@ de validação espelham as da API para feedback imediato; erros por campo vindos
 - **Aba "Avaliações de colecionadores":** mostra a média e o total; comentários individuais
   não fazem parte dos contratos.
 - **Preço anterior** aparece riscado e com rótulo para leitores de tela ("Preço anterior").
+- **Carrinho (desktop):** a coluna "Edições" do Figma virou "Quantidade" e cada linha mostra
+  também a edição, pois o mesmo NFT pode estar no carrinho em edições diferentes. O desconto
+  aparece como "Desconto (CÓDIGO)" com a descrição do cupom, em vez do rótulo fixo
+  "Desconto do lançamento". Cupom aplicado vira um selo com "Remover".
+- **Carrinho (mobile):** o resumo fica no fluxo da página (cartão com cantos superiores
+  arredondados) e só o botão "Conectar e finalizar" acompanha a rolagem, acima da barra
+  inferior; a lixeira fica abaixo do stepper. "Colecionadores também viram" usa grade/rolagem
+  horizontal em vez de carrossel com pontos.
 - **Estado autenticado do header** (sem frame): avatar com inicial e menu da conta.
 - **Mobile do login/cadastro e do detalhe:** sem barra inferior (como nos frames); o detalhe
   usa a barra fixa de compra do frame mobile-02.

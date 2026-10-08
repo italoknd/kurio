@@ -4,34 +4,34 @@ Checklist vivo do que falta para concluir o desafio, organizado pelas etapas do 
 cruzado com o enunciado ([docs/DESAFIO.md](DESAFIO.md)). O histórico do que já foi feito
 está em [docs/PROGRESSO.md](PROGRESSO.md).
 
-**Situação em 08/10/2026:** etapas 0 a 4 concluídas (fundação, contratos e mocks, conta e
-sessão, catálogo e detalhe). Commit mais recente: `d89dca2`. 58 testes E2E passando.
+**Situação em 08/10/2026:** etapas 0 a 5 concluídas (fundação, contratos e mocks, conta e
+sessão, catálogo e detalhe, carrinho e cotação). Próxima: etapa 6 (tempo real).
 
 Legenda: ✅ feito · 🟡 parcial · ⬜ pendente
 
 ---
 
-## Etapa 5 — Carrinho e cotação
+## Etapa 5 — Carrinho e cotação ✅
 
-Tela: [desktop-03-carrinho.png](figma/desktop-03-carrinho.png) e
-[mobile-03-carrinho.png](figma/mobile-03-carrinho.png). Rota: `/carrinho` (hoje placeholder).
+Tela `/carrinho` concluída (frames desktop-03 e mobile-03). Detalhes em
+[PROGRESSO.md](PROGRESSO.md#etapa-5--carrinho-e-cotação).
 
 | Requisito (enunciado §3) | Status | Observação |
 | --- | --- | --- |
-| Listar itens (imagem, nome, ID do token, edição, preço, total da linha) | ⬜ | Dados em `GET /cart` |
-| Alterar quantidade respeitando disponibilidade por NFT e edição | ⬜ | `PATCH /cart/items/:id`; `QuantityStepper` já existe; tratar 409 |
-| Remover item | ⬜ | `DELETE /cart/items/:id`, com confirmação acessível ou desfazer |
-| Aplicar e remover cupom, com erro de código inválido/expirado | ⬜ | `PUT`/`DELETE /cart/coupon`; erros vêm em `fields.code` |
-| Resumo: subtotal, desconto, taxa de rede e total vindos da API | ⬜ | `GET /cart/quote?network=`; nunca calcular o total só no cliente |
-| Skeleton com shimmer no resumo e na lista | ⬜ | Mesmas dimensões do conteúdo |
-| Carrinho mantido após refresh | 🟡 | Id do visitante já é guardado; falta a tela |
-| Itens do visitante preservados ao autenticar | ✅ | `POST /cart/merge` no login (etapa 3) |
-| Itens com problema de disponibilidade (`quote.issues`) destacados | ⬜ | Bloquear "Conectar e finalizar" enquanto houver problema |
-| Estado vazio do carrinho | ⬜ | Link para o catálogo |
-| Seção "Colecionadores também viram" | ⬜ | `nftListQuery({ tab: 'em-alta' })` |
-| "Conectar e finalizar" leva ao pagamento (login se visitante) | ⬜ | Rota privada `/pagamento` já protegida |
-| Versão mobile (lista em cards, cupom e resumo abaixo, botão fixo) | ⬜ | Frame mobile-03 |
-| Testes E2E (enunciado §9, item 5) | ⬜ | Quantidades, remoção, cupom, persistência após refresh e login |
+| Listar itens (imagem, nome, ID do token, edição, preço, total da linha) | ✅ | |
+| Alterar quantidade respeitando disponibilidade por NFT e edição | ✅ | Otimista, em série por item, 409 tratado |
+| Remover item | ✅ | Toast com "Desfazer" |
+| Aplicar e remover cupom, com erro de código inválido/expirado | ✅ | |
+| Resumo: subtotal, desconto, taxa de rede e total vindos da API | ✅ | Rede Ethereum até o pagamento |
+| Skeleton com shimmer no resumo e na lista | ✅ | |
+| Carrinho mantido após refresh | ✅ | |
+| Itens do visitante preservados ao autenticar | ✅ | |
+| Itens com problema de disponibilidade (`quote.issues`) destacados | ✅ | Bloqueiam "Conectar e finalizar" |
+| Estado vazio do carrinho | ✅ | |
+| Seção "Colecionadores também viram" | ✅ | |
+| "Conectar e finalizar" leva ao pagamento (login se visitante) | ✅ | |
+| Versão mobile (lista em cards, cupom e resumo abaixo, botão fixo) | ✅ | Botão acompanha a rolagem |
+| Testes E2E (enunciado §9, item 5) | ✅ | `e2e/cart.spec.ts` |
 
 ## Etapa 6 — Tempo real (Socket.IO)
 
@@ -47,7 +47,7 @@ que publica `nft.updated` e `order.updated` com id estável e versão.
 | Eventos de sessão anterior não afetam outro usuário | 🟡 | Socket já reconecta com o novo token; falta descartar eventos na troca |
 | Liberar listeners e subscriptions ao fim do ciclo de vida | ⬜ | Hook com `socket.off` no cleanup |
 | Feedback acessível das alterações (aria-live) | ⬜ | "O preço de X mudou de A para B" |
-| Cenário: NFT no carrinho muda de preço → interface avisa e atualiza o resumo | ⬜ | Banner no carrinho + nova cotação |
+| Cenário: NFT no carrinho muda de preço → interface avisa e atualiza o resumo | ⬜ | Tela pronta: basta invalidar `['cart']` e a cotação no evento e avisar (aria-live) |
 | Checkout impede confirmação com cotação desatualizada | 🟡 | API já responde 409 `QUOTE_OUTDATED`; falta a interface |
 | Testes E2E (§9, itens 9 e 10) | ⬜ | Via `window.__kurioMocks.nfts.update`, `socket.replay`, `socket.setAvailable` |
 
@@ -95,7 +95,7 @@ Layout da área (sidebar, "Sair") e lista de interesse já existem.
 
 | Requisito (enunciado §8–§12) | Status | Observação |
 | --- | --- | --- |
-| Testes E2E restantes (§9) | 🟡 | Feitos: itens 1, 2, 3, 4, 11 (parcial) e 12. Faltam: 5–10 e o restante do 11 |
+| Testes E2E restantes (§9) | 🟡 | Feitos: itens 1, 2, 3, 4, 5, 11 (parcial) e 12. Faltam: 6–10 e o restante do 11 |
 | Regressão visual (início, detalhe, carrinho, pagamento) com baselines versionadas | ⬜ | `toHaveScreenshot`, dados estáveis, desktop e mobile |
 | Controle de relógio, latência e disparo de eventos nos testes sensíveis a tempo | 🟡 | Latência e eventos controláveis; falta `page.clock` onde houver tempo |
 | Lighthouse em início e detalhe, mobile e desktop, 3 medições, mediana | ⬜ | Configuração versionada, relatórios HTML/JSON, LCP/CLS/TBT |
@@ -119,12 +119,19 @@ Layout da área (sidebar, "Sair") e lista de interesse já existem.
 - **Resolução das ilustrações:** limitadas ao export do Figma (434 px e 238 px); trocar se
   houver export em resolução maior.
 - **Lupa do header:** leva ao catálogo, mas não foca o campo de busca.
+- **Lentidão dos testes em paralelo:** a primeira renderização após um carregamento completo
+  passa de 5 s com muitos workers; o carrinho usa uma espera de 15 s no carregamento inicial.
+  Avaliar `expect.timeout` global ou menos workers se outros specs ficarem instáveis.
+- **Junção do carrinho no login** roda depois de a sessão começar: se a página recarregar
+  nesse intervalo, o `POST /cart/merge` é cancelado (o id do visitante é mantido e a junção é
+  repetida no próximo login). Avaliar refazer a junção ao iniciar o app com sessão e id de
+  visitante presentes.
 - **Painel de cenários no mobile:** botão no canto direito pode sobrepor conteúdo pontualmente
   (ferramenta de demonstração).
 
 ## Ordem sugerida
 
-1. Etapa 5 (carrinho), pois as etapas 6 e 7 dependem dela.
+1. ~~Etapa 5 (carrinho)~~ ✅
 2. Etapa 6 (tempo real), necessária para o cenário "preço muda durante a compra".
 3. Etapa 7 (checkout e pedido), o fluxo mais crítico da avaliação.
 4. Etapa 8 (perfil e carteiras): o checkout depende de carteiras, mas os dados de exemplo da
