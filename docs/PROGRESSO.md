@@ -19,6 +19,8 @@ encontrados, como validar e os commits correspondentes.
 | 8 | Perfil e carteiras | Pendente |
 | 9 | Testes, Lighthouse, deploy e documentação final | Pendente |
 
+Requisitos que faltam, por etapa, e pendências técnicas: [docs/PROXIMOS-PASSOS.md](PROXIMOS-PASSOS.md).
+
 ---
 
 ## Etapa 0 — Preparação
@@ -217,3 +219,5 @@ na URL), detalhe do NFT com galeria, edições, quantidade, favoritos e compra.
 
 **Validação:** `npm run build`, `npm run lint`, `npm run test:e2e` (58 testes; catálogo e
 detalhe repetidos 3× sem falhas).
+
+**Commit:** `d89dca2`.

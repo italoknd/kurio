@@ -57,6 +57,10 @@ status no roteiro e uma seção com objetivo, o que foi entregue, decisões, pro
 encontrados, como validar e os commits. O registro faz parte da task e entra no mesmo
 commit (o hash do próprio commit pode ser preenchido no commit seguinte).
 
+Manter também [docs/PROXIMOS-PASSOS.md](docs/PROXIMOS-PASSOS.md) atualizado: marcar os
+requisitos concluídos, ajustar a situação atual e registrar novas pendências técnicas.
+Ao iniciar uma sessão, ler esse arquivo para saber onde o desenvolvimento parou.
+
 ### Commit e push ao finalizar cada task
 
 Sempre que uma instrução/task do usuário for concluída e houver alterações no repositório:
