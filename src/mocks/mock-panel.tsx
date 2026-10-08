@@ -73,6 +73,35 @@ export default function MockPanel() {
             </RadioGroup>
           </fieldset>
 
+          <ChoiceGroup
+            legend="Pagamento dos próximos pedidos"
+            name="payment"
+            value={config.payment}
+            options={[
+              ['aprovar', 'Confirmar'],
+              ['recusar', 'Recusar'],
+            ]}
+            onChange={(value) => mockControls.setConfig({ payment: value as 'aprovar' | 'recusar' })}
+          />
+
+          <ChoiceGroup
+            legend="Conexão da carteira"
+            name="wallet"
+            value={config.walletConnection}
+            options={[
+              ['aceitar', 'Aceitar'],
+              ['recusar', 'Recusar'],
+            ]}
+            onChange={(value) => mockControls.setConfig({ walletConnection: value as 'aceitar' | 'recusar' })}
+          />
+
+          <div className="space-y-2">
+            <p className="text-sm font-bold">Sessão</p>
+            <Button variant="outline" size="sm" onClick={() => mockControls.session.expireAll()}>
+              Expirar sessões ativas
+            </Button>
+          </div>
+
           <div className="space-y-2">
             <p className="text-sm font-bold">Tempo real (Socket.IO)</p>
             <Button variant="outline" size="sm" onClick={toggleSocket} aria-pressed={!socketUp}>
@@ -89,5 +118,33 @@ export default function MockPanel() {
         </div>
       </SheetContent>
     </Sheet>
+  )
+}
+
+function ChoiceGroup({
+  legend,
+  name,
+  value,
+  options,
+  onChange,
+}: {
+  legend: string
+  name: string
+  value: string
+  options: [string, string][]
+  onChange: (value: string) => void
+}) {
+  return (
+    <fieldset>
+      <legend className="mb-2 text-sm font-bold">{legend}</legend>
+      <RadioGroup value={value} onValueChange={onChange} className="flex gap-4">
+        {options.map(([optionValue, label]) => (
+          <div key={optionValue} className="flex items-center gap-2">
+            <RadioGroupItem value={optionValue} id={`${name}-${optionValue}`} />
+            <Label htmlFor={`${name}-${optionValue}`}>{label}</Label>
+          </div>
+        ))}
+      </RadioGroup>
+    </fieldset>
   )
 }

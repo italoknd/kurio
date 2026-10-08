@@ -1,15 +1,25 @@
 import { delay, HttpResponse } from 'msw'
 import { env } from '@/lib/env'
 import { getMockConfig, nextRandom } from '@/mocks/config'
-import type { ApiErrorBody, ApiErrorCode } from '@/types/api'
+import type { ApiErrorBody, ApiErrorCode, ConflictReason } from '@/types/api'
 
 /** Monta a URL absoluta de uma rota REST, respeitando VITE_API_URL. */
 export function apiUrl(path: string) {
   return new URL(`${env.apiUrl}${path}`, window.location.origin).href
 }
 
-export function errorResponse(status: number, code: ApiErrorCode, message: string, fields?: Record<string, string>) {
-  return HttpResponse.json<ApiErrorBody>({ code, message, ...(fields && { fields }) }, { status })
+export function errorResponse(
+  status: number,
+  code: ApiErrorCode,
+  message: string,
+  fields?: Record<string, string>,
+  reason?: ConflictReason,
+  details?: unknown,
+) {
+  return HttpResponse.json<ApiErrorBody>(
+    { code, message, ...(fields && { fields }), ...(reason && { reason }), ...(details !== undefined && { details }) },
+    { status },
+  )
 }
 
 interface ForcedFailure {

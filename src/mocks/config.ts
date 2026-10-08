@@ -19,13 +19,32 @@ export interface MockConfig {
   network: NetworkProfile
   /** Seed do gerador pseudoaleatório (latência variável e falhas intermitentes). */
   seed: number
+  /** Resultado da simulação de pagamento dos próximos pedidos. */
+  payment: 'aprovar' | 'recusar'
+  /** Resposta da carteira ao pedido de conexão. */
+  walletConnection: 'aceitar' | 'recusar'
+  /** Tempo entre a criação do pedido e a confirmação/recusa. */
+  orderDelayMs: number
+  /** Duração das novas sessões. */
+  sessionTtlMinutes: number
 }
 
 const STORAGE_KEY = 'kurio:mocks:config'
-const DEFAULT_CONFIG: MockConfig = { network: 'normal', seed: 1 }
+const DEFAULT_CONFIG: MockConfig = {
+  network: 'normal',
+  seed: 1,
+  payment: 'aprovar',
+  walletConnection: 'aceitar',
+  orderDelayMs: 4000,
+  sessionTtlMinutes: 60,
+}
 
 function isProfile(value: unknown): value is NetworkProfile {
   return typeof value === 'string' && value in NETWORK_PROFILES
+}
+
+function isPositiveInt(value: unknown): value is number {
+  return Number.isInteger(value) && (value as number) >= 0
 }
 
 function load(): MockConfig {
@@ -34,6 +53,12 @@ function load(): MockConfig {
     return {
       network: isProfile(stored?.network) ? stored.network : DEFAULT_CONFIG.network,
       seed: Number.isInteger(stored?.seed) ? stored!.seed! : DEFAULT_CONFIG.seed,
+      payment: stored?.payment === 'recusar' ? 'recusar' : 'aprovar',
+      walletConnection: stored?.walletConnection === 'recusar' ? 'recusar' : 'aceitar',
+      orderDelayMs: isPositiveInt(stored?.orderDelayMs) ? stored.orderDelayMs : DEFAULT_CONFIG.orderDelayMs,
+      sessionTtlMinutes: isPositiveInt(stored?.sessionTtlMinutes)
+        ? stored.sessionTtlMinutes
+        : DEFAULT_CONFIG.sessionTtlMinutes,
     }
   } catch {
     return { ...DEFAULT_CONFIG }

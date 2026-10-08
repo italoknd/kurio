@@ -50,6 +50,13 @@ implementar ou ajustar uma tela, abra o frame correspondente e compare o resulta
 
 ## Automações
 
+### Registro de progresso
+
+Ao concluir cada etapa ou task relevante, atualizar [docs/PROGRESSO.md](docs/PROGRESSO.md):
+status no roteiro e uma seção com objetivo, o que foi entregue, decisões, problemas
+encontrados, como validar e os commits. O registro faz parte da task e entra no mesmo
+commit (o hash do próprio commit pode ser preenchido no commit seguinte).
+
 ### Commit e push ao finalizar cada task
 
 Sempre que uma instrução/task do usuário for concluída e houver alterações no repositório:
