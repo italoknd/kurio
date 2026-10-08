@@ -14,8 +14,8 @@ encontrados, como validar e os commits correspondentes.
 | 3 | Conta e sessão | Concluída |
 | 4 | Catálogo e detalhe | Concluída |
 | 5 | Carrinho e cotação | Concluída |
-| 6 | Tempo real | Concluída (itens de checkout seguem na etapa 7) |
-| 7 | Checkout e pedido | Pendente |
+| 6 | Tempo real | Concluída |
+| 7 | Checkout e pedido | Concluída |
 | 8 | Perfil e carteiras | Pendente |
 | 9 | Testes, Lighthouse, deploy e documentação final | Pendente |
 
@@ -309,5 +309,53 @@ interface, com tolerância a duplicatas, eventos antigos e quedas (enunciado §7
 
 **Validação:** `npm run build`, `npm run lint`, `npm run test:e2e` (82 testes; specs de tempo
 real repetidos 3×).
+
+**Commit:** `0c25492`.
+
+---
+
+## Etapa 7 — Checkout e pedido
+
+**Objetivo:** pagamento com carteira cadastrada (frames desktop-04 e mobile-04), revisão,
+envio idempotente e acompanhamento do pedido até o recibo (frame desktop-05).
+
+**Entregue:**
+- **`/pagamento`:** formulário do colecionador (react-hook-form + zod, erros da API por
+  campo) pré-preenchido pela carteira principal; seleção de carteira cadastrada (radio) e de
+  rede (a cotação e a taxa seguem a rede); itens, resumo e link para o cupom no carrinho.
+- **Carteira:** conexão simulada (aceita/recusada pelo cenário), "Conectar agora" e
+  "Desconectar"; a conexão vale para a combinação carteira + rede.
+- **Revisão** em diálogo antes do envio. Se a cotação mudar (evento `nft.updated` ou 409
+  `QUOTE_OUTDATED` com a cotação nova), o envio fica bloqueado até "Revisar novos valores";
+  itens indisponíveis levam de volta ao carrinho.
+- **Idempotência:** chave por tentativa (mesmo corpo → mesma chave), gravada de forma
+  síncrona em sessionStorage antes do envio; envios em série (`scope`). Sem resposta
+  (timeout/queda), a tentativa fica pendente e "Verificar pedido" reenvia exatamente a mesma
+  tentativa — a API devolve o pedido já criado.
+- **Rascunho do formulário** por usuário em sessionStorage: sessão expirada no checkout leva
+  ao login e, na volta, o formulário é restaurado.
+- **`/pedidos/$orderId`:** pendente (com aviso de que pode sair da página), recusado (motivo;
+  itens preservados no carrinho) e confirmado com o recibo do snapshot do pedido (transação,
+  data, total, carteira, itens, taxa e link simulado do explorador). Atualizado por
+  `order.updated` e, como reserva, por consulta a cada 5 s enquanto pendente; anúncio e foco
+  no título quando o status muda; carrinho recarregado ao confirmar.
+- Aviso de pedido pendente no pagamento (`GET /orders?status=pending`).
+- Testes E2E: `e2e/checkout.spec.ts` (10 cenários × desktop e mobile).
+
+**Decisões:**
+- Endereço e tipo da carteira não são digitados no checkout: vêm da carteira cadastrada
+  escolhida (o contrato do pedido usa `walletId`); "Usar outra carteira?" do Figma virou a
+  lista de carteiras.
+- Recibo como página (mesmo visual do modal do frame 05), para funcionar em acesso direto e
+  refresh; o "X" volta ao início.
+- O cupom continua sendo aplicado no carrinho (link "Aplique no carrinho").
+
+**Problemas encontrados:**
+- **Duplo clique podia gerar duas chaves:** a tentativa era gravada dentro da mutation
+  (assíncrona) → gravação síncrona antes de `mutate` + envios em série.
+- Avisos do lint do React Compiler (`form.watch`, ref em handler) → `useWatch`,
+  `form.subscribe` e foco por id.
+
+**Validação:** `npm run build`, `npm run lint`, `npm run test:e2e`.
 
 **Commit:** (preenchido no próximo commit).

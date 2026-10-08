@@ -95,6 +95,24 @@ http://localhost:5173/?mockReset
 **Cenários de negócio (painel):** pagamento confirmado ou recusado, conexão da carteira
 aceita ou recusada, expirar as sessões ativas, derrubar e restabelecer o tempo real.
 
+**Fluxos de falha do checkout (passo a passo):**
+
+1. **Pagamento recusado:** painel → pagamento "recusar"; finalize uma compra; a tela do pedido
+   mostra o motivo e os itens continuam no carrinho.
+2. **Carteira recusa a conexão:** painel → conexão "recusar"; "Confirmar compra" mostra o erro
+   junto da carteira; volte para "aceitar" e use "Conectar agora".
+3. **Timeout após criar o pedido:** no console, `__kurioMocks.orders.timeoutNextCreate()`;
+   confirme a compra; após 10 s aparece "Verificar pedido", que recupera o mesmo pedido.
+4. **Preço muda durante a revisão:** com a revisão aberta, rode
+   `__kurioMocks.nfts.update('emerald-ape-042', { editionId: '1-50', price: '1.29' })`; o
+   diálogo pede para revisar os novos valores.
+5. **Cotação desatualizada sem tempo real:** derrube o tempo real no painel, altere o preço
+   como acima e confirme; a API responde 409 e o diálogo pede nova confirmação.
+6. **Pedido pendente após refresh:** confirme a compra e recarregue a página do pedido; ele
+   continua pendente e é confirmado em seguida.
+7. **Sessão expirada no checkout:** preencha o formulário, painel → expirar sessões, confirme;
+   após o login o formulário volta preenchido.
+
 **Controles para testes e reprodução manual** (`window.__kurioMocks`, no console do navegador):
 
 | Controle | Efeito |

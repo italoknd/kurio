@@ -94,6 +94,8 @@ function applyOrder(queryClient: QueryClient, userId: string, event: OrderUpdate
     order && order.version >= event.version ? order : event.data,
   )
   void queryClient.invalidateQueries({ queryKey: ['user', userId, 'orders'] })
+  // Confirmado: a API removeu do carrinho só os itens e quantidades comprados.
+  if (event.data.status === 'confirmed') void queryClient.invalidateQueries({ queryKey: queryKeys.cart(userId) })
 }
 
 /**

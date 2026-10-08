@@ -4,9 +4,8 @@ Checklist vivo do que falta para concluir o desafio, organizado pelas etapas do 
 cruzado com o enunciado ([docs/DESAFIO.md](DESAFIO.md)). O histórico do que já foi feito
 está em [docs/PROGRESSO.md](PROGRESSO.md).
 
-**Situação em 08/10/2026:** etapas 0 a 5 concluídas e etapa 6 (tempo real) concluída no que
-não depende do checkout. Próxima: etapa 7 (checkout e pedido), que fecha os itens restantes
-da etapa 6.
+**Situação em 08/10/2026:** etapas 0 a 7 concluídas (até checkout e pedido). Próxima:
+etapa 8 (perfil e carteiras).
 
 Legenda: ✅ feito · 🟡 parcial · ⬜ pendente
 
@@ -34,47 +33,45 @@ Tela `/carrinho` concluída (frames desktop-03 e mobile-03). Detalhes em
 | Versão mobile (lista em cards, cupom e resumo abaixo, botão fixo) | ✅ | Botão acompanha a rolagem |
 | Testes E2E (enunciado §9, item 5) | ✅ | `e2e/cart.spec.ts` |
 
-## Etapa 6 — Tempo real (Socket.IO) 🟡
+## Etapa 6 — Tempo real (Socket.IO) ✅
 
-Sincronização pronta (`features/realtime/use-realtime-sync.ts`). Restam os pontos que
-dependem da tela de pagamento/pedido (etapa 7). Detalhes em
+Sincronização pronta (`features/realtime/use-realtime-sync.ts`), concluída com a etapa 7.
+Detalhes em
 [PROGRESSO.md](PROGRESSO.md#etapa-6--tempo-real).
 
 | Requisito (enunciado §7) | Status | Observação |
 | --- | --- | --- |
 | `nft.updated` atualiza preço e disponibilidade no catálogo, detalhe e carrinho | ✅ | Catálogo/detalhe via `setQueryData` com versão; carrinho e cotação recarregados da API |
-| `order.updated` atualiza o estado do pedido | 🟡 | Cache `['user', id, 'order', orderId]` e listas atualizados; falta a tela do pedido (etapa 7) |
+| `order.updated` atualiza o estado do pedido | ✅ | Tela do pedido acompanha o cache `['user', id, 'order', orderId]` |
 | Tolerar duplicatas e eventos antigos (não regredir versão nem reaplicar efeitos) | ✅ | `EventTracker` (ids vistos + última versão por recurso) e versão do cache |
 | Reconciliar recursos ativos com a REST após reconexão | ✅ | Evento `reconnect` do Manager invalida catálogo, carrinho e dados do usuário |
 | Eventos de sessão anterior não afetam outro usuário | ✅ | Listeners refeitos por usuário; pedidos esquecidos e avisos limpos na troca |
 | Liberar listeners e subscriptions ao fim do ciclo de vida | ✅ | `socket.off` / `socket.io.off` no cleanup |
 | Feedback acessível das alterações (aria-live) | ✅ | Toast (região viva) + aviso persistente no carrinho |
 | Cenário: NFT no carrinho muda de preço → interface avisa e atualiza o resumo | ✅ | |
-| Checkout impede confirmação com cotação desatualizada | 🟡 | Carrinho bloqueia enquanto recalcula; falta o diálogo de reconfirmação no pagamento (409 `QUOTE_OUTDATED`) |
-| Testes E2E (§9, itens 9 e 10) | 🟡 | `e2e/realtime.spec.ts`; faltam os cenários durante o checkout e de pedido pendente (etapa 7) |
+| Checkout impede confirmação com cotação desatualizada | ✅ | Diálogo de revisão bloqueia e pede nova confirmação |
+| Testes E2E (§9, itens 9 e 10) | ✅ | `e2e/realtime.spec.ts` e `e2e/checkout.spec.ts` |
 
-## Etapa 7 — Checkout e pedido
+## Etapa 7 — Checkout e pedido ✅
 
-Telas: [desktop-04-pagamento.png](figma/desktop-04-pagamento.png),
-[mobile-04-pagamento.png](figma/mobile-04-pagamento.png),
-[desktop-05-confirmacao-pedido.png](figma/desktop-05-confirmacao-pedido.png).
-Rotas: `/pagamento` e `/pedidos/$orderId` (placeholders, já protegidas).
+Telas `/pagamento` e `/pedidos/$orderId` concluídas. Detalhes em
+[PROGRESSO.md](PROGRESSO.md#etapa-7--checkout-e-pedido).
 
 | Requisito (enunciado §3 e §4) | Status | Observação |
 | --- | --- | --- |
-| Formulário do colecionador com os campos do layout e validação | ⬜ | react-hook-form + zod; erros da API em `collector.*` |
-| Seleção de carteira cadastrada e de rede | ⬜ | `GET /wallets`; sem carteira → link para cadastrar |
-| Simulação de conexão, recusa e desconexão da carteira | 🟡 | API pronta (`POST /wallets/:id/connect`, cenário no painel); falta a interface |
-| Revisão antes do envio | ⬜ | Etapa de revisão com a cotação exibida |
-| Revalidar preço, disponibilidade, cupom e taxas; mudança exige nova confirmação | 🟡 | API responde 409 com a cotação nova; falta o diálogo de reconfirmação |
-| Impedir pedidos duplicados (cliques repetidos, reenvio após timeout) | 🟡 | API idempotente; falta gerar e persistir a `Idempotency-Key` por tentativa (sessionStorage) |
-| Estados pendente, confirmado e recusado | ⬜ | Tela do pedido com `order.updated` |
-| Recuperação após refresh ou reconexão (pedido pendente) | 🟡 | Mock retoma pendentes; falta `GET /orders?status=pending` na interface |
-| Confirmação exibida só para pedido confirmado | ⬜ | Modal do frame 05 |
-| Recibo com o snapshot do pedido (transação, itens, taxas, total, link simulado) | ⬜ | Dados de `Order` |
-| Preservar itens em falha; remover só os comprados após confirmação | 🟡 | Feito no mock; falta invalidar o carrinho ao confirmar |
-| Sessão expirada no checkout preserva o contexto | 🟡 | Redirecionamento com destino pronto; falta guardar o rascunho do formulário |
-| Testes E2E (§9, itens 6, 7 e 10) | ⬜ | Compra completa, recusa, clique repetido, timeout, pedido pendente |
+| Formulário do colecionador com os campos do layout e validação | ✅ | Pré-preenchido pela carteira; erros da API em `collector.*` |
+| Seleção de carteira cadastrada e de rede | ✅ | Sem carteira → link para cadastrar |
+| Simulação de conexão, recusa e desconexão da carteira | ✅ | Conexão vale para carteira + rede |
+| Revisão antes do envio | ✅ | Diálogo de revisão |
+| Revalidar preço, disponibilidade, cupom e taxas; mudança exige nova confirmação | ✅ | Por evento em tempo real ou 409 `QUOTE_OUTDATED` |
+| Impedir pedidos duplicados (cliques repetidos, reenvio após timeout) | ✅ | Chave por tentativa (sessionStorage) + envio em série; "Verificar pedido" reenvia a mesma tentativa |
+| Estados pendente, confirmado e recusado | ✅ | `order.updated` + consulta periódica de reserva |
+| Recuperação após refresh ou reconexão (pedido pendente) | ✅ | Aviso de pedido pendente no pagamento |
+| Confirmação exibida só para pedido confirmado | ✅ | Recibo só com status `confirmed` |
+| Recibo com o snapshot do pedido (transação, itens, taxas, total, link simulado) | ✅ | |
+| Preservar itens em falha; remover só os comprados após confirmação | ✅ | Carrinho recarregado ao confirmar |
+| Sessão expirada no checkout preserva o contexto | ✅ | Rascunho do formulário por usuário |
+| Testes E2E (§9, itens 6, 7 e 10) | ✅ | `e2e/checkout.spec.ts` |
 
 ## Etapa 8 — Perfil e carteiras
 
@@ -97,7 +94,7 @@ Layout da área (sidebar, "Sair") e lista de interesse já existem.
 
 | Requisito (enunciado §8–§12) | Status | Observação |
 | --- | --- | --- |
-| Testes E2E restantes (§9) | 🟡 | Feitos: itens 1–5, 12 e partes de 9, 10 e 11. Faltam: 6–8, o checkout em 9 e 10 e o restante do 11 |
+| Testes E2E restantes (§9) | 🟡 | Feitos: itens 1–7, 9, 10, 12 e parte do 11. Faltam: 8 e o restante do 11 |
 | Regressão visual (início, detalhe, carrinho, pagamento) com baselines versionadas | ⬜ | `toHaveScreenshot`, dados estáveis, desktop e mobile |
 | Controle de relógio, latência e disparo de eventos nos testes sensíveis a tempo | 🟡 | Latência e eventos controláveis; falta `page.clock` onde houver tempo |
 | Lighthouse em início e detalhe, mobile e desktop, 3 medições, mediana | ⬜ | Configuração versionada, relatórios HTML/JSON, LCP/CLS/TBT |
@@ -133,14 +130,18 @@ Layout da área (sidebar, "Sair") e lista de interesse já existem.
   nesse intervalo, o `POST /cart/merge` é cancelado (o id do visitante é mantido e a junção é
   repetida no próximo login). Avaliar refazer a junção ao iniciar o app com sessão e id de
   visitante presentes.
+- **Pagamento no mobile:** o frame mobile-04 mostra só carteiras e total; a tela usa o mesmo
+  formulário do desktop empilhado (formulário, itens, resumo, carteiras) com o botão fixo.
+- **Tentativa sem resposta bloqueia novas compras** até ser verificada; se o pedido nunca
+  chegou ao servidor, a verificação o cria com os dados da tentativa (documentado na tela).
 - **Painel de cenários no mobile:** botão no canto direito pode sobrepor conteúdo pontualmente
   (ferramenta de demonstração).
 
 ## Ordem sugerida
 
 1. ~~Etapa 5 (carrinho)~~ ✅
-2. ~~Etapa 6 (tempo real)~~ 🟡 (restante junto com a etapa 7)
-3. Etapa 7 (checkout e pedido), o fluxo mais crítico da avaliação.
+2. ~~Etapa 6 (tempo real)~~ ✅
+3. ~~Etapa 7 (checkout e pedido)~~ ✅
 4. Etapa 8 (perfil e carteiras): o checkout depende de carteiras, mas os dados de exemplo da
    Ana já permitem desenvolver a etapa 7 antes.
 5. Etapa 9 (testes restantes, regressão visual, Lighthouse, deploy e documentação).

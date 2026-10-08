@@ -157,6 +157,23 @@ carrega, o snapshot seria vazio e `setQueryData(undefined)` é ignorado pelo Tan
   juntado ao carrinho da conta no login (`POST /cart/merge`). "Conectar e finalizar" leva a
   `/pagamento`; a rota privada manda o visitante ao login com retorno ao pagamento.
 
+## Checkout e pedido
+
+- **Revisão com cotação congelada:** ao abrir a revisão, a cotação exibida é guardada e é o
+  `quoteId` enviado. Se a cotação ao vivo mudar (evento ou 409 `QUOTE_OUTDATED`, cuja cotação
+  nova é gravada no cache), o envio fica bloqueado até o usuário aceitar os novos valores.
+- **Idempotência por tentativa** (`features/checkout/checkout-storage.ts`): a chave é
+  reaproveitada enquanto o corpo do pedido for o mesmo e trocada quando ele muda. A tentativa
+  é gravada em sessionStorage antes do envio. Respostas da API (2xx, 4xx) resolvem a
+  tentativa; falhas transitórias (timeout, rede, 5xx) a mantêm pendente e a interface só
+  permite reenviá-la como está, então nunca há dois pedidos para a mesma intenção de compra.
+- **Rascunho** do formulário em sessionStorage por usuário (`form.subscribe`), limpo após o
+  pedido criado.
+- **Pedido:** `useOrder` lê `['user', userId, 'order', id]`, atualizado por `order.updated`;
+  enquanto pendente, uma consulta a cada 5 s cobre quedas do tempo real. Na confirmação, o
+  carrinho é recarregado (a API remove só o que foi comprado).
+- **Carteira:** a conexão simulada é estado local da página e vale para carteira + rede.
+
 ## Callbacks de mutation e desmontagem
 
 Ações que levam a outra página (login na página cheia, "Sair", comprar) colocam efeitos
@@ -258,6 +275,13 @@ de validação espelham as da API para feedback imediato; erros por campo vindos
   arredondados) e só o botão "Conectar e finalizar" acompanha a rolagem, acima da barra
   inferior; a lixeira fica abaixo do stepper. "Colecionadores também viram" usa grade/rolagem
   horizontal em vez de carrossel com pontos.
+- **Pagamento:** endereço e tipo da carteira vêm da carteira cadastrada escolhida (lista de
+  carteiras no lugar dos campos de endereço/tipo e de "Usar outra carteira?"); o cupom é
+  aplicado no carrinho. Revisão em diálogo antes de confirmar (não desenhada). No mobile, o
+  mesmo formulário empilhado, com total e "Confirmar compra" fixos.
+- **Confirmação:** o recibo do frame 05 é uma página (`/pedidos/$id`), não um modal, para
+  funcionar em acesso direto e refresh; estados pendente e recusado seguem o mesmo padrão
+  visual.
 - **Estado autenticado do header** (sem frame): avatar com inicial e menu da conta.
 - **Mobile do login/cadastro e do detalhe:** sem barra inferior (como nos frames); o detalhe
   usa a barra fixa de compra do frame mobile-02.
