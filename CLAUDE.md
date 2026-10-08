@@ -10,7 +10,10 @@ O enunciado completo é a fonte da verdade e está em [docs/DESAFIO.md](docs/DES
 (original: https://github.com/junglegaming/frontend-challenge). Consulte-o antes de
 implementar qualquer tela, fluxo, contrato ou teste.
 
-Layout de referência: [Figma](https://www.figma.com/design/Ff0SksUi7UFtPWUO8kyNtw/Frontend-Challenge?node-id=0-1).
+Layout de referência: [Figma](https://www.figma.com/design/Ff0SksUi7UFtPWUO8kyNtw/Frontend-Challenge?node-id=0-1)
+(sem acesso direto). Use os frames exportados em [docs/figma/](docs/figma/) e os tokens,
+tipografia e componentes documentados em [docs/DESIGN.md](docs/DESIGN.md). Antes de
+implementar ou ajustar uma tela, abra o frame correspondente e compare o resultado.
 
 ### Stack obrigatória (não substituir)
 
