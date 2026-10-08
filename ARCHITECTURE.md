@@ -199,6 +199,26 @@ de validação espelham as da API para feedback imediato; erros por campo vindos
 - Eventos têm `id` estável e `version` do recurso; o mock mantém um log para reenviar
   duplicatas nos testes.
 
+### Sincronização com o cache (`features/realtime/use-realtime-sync.ts`)
+
+- **`nft.updated`:** cards do catálogo, destaques e detalhe recebem preço/disponibilidade por
+  `setQueryData`, só quando `event.version` é maior que a `version` do dado em cache (uma
+  resposta REST mais nova nunca é sobrescrita por um evento atrasado). Carrinho e cotação não
+  são ajustados no cliente: são invalidados e recarregados da API.
+- **Avisos:** a mudança é descrita comparando o item do carrinho (ou o detalhe aberto) com o
+  evento, e anunciada por toast (região viva do sonner) e por um aviso persistente no
+  carrinho. Por ser derivado da diferença, reaplicar o mesmo estado não gera novo aviso.
+- **`order.updated`:** grava o pedido em `['user', userId, 'order', id]` sem regredir versão e
+  invalida as listas. Sem sessão, o evento é descartado.
+- **Duplicatas e eventos antigos:** `EventTracker` guarda os últimos 500 ids e a última versão
+  aplicada por recurso (`tipo:id`); na troca de usuário esquece os pedidos.
+- **Reconexão:** o evento `reconnect` do Manager (só reconexões automáticas) invalida
+  catálogo, carrinho e dados do usuário; as consultas ativas são refeitas na API, cobrindo os
+  eventos perdidos durante a queda. Limitação: mudanças ocorridas durante a queda não geram o
+  aviso "o preço mudou", apenas atualizam os valores.
+- **Ciclo de vida:** os listeners são registrados por usuário e removidos no cleanup
+  (`socket.off` / `socket.io.off`); a troca de sessão também refaz a conexão com o novo token.
+
 ### Limitações do transporte simulado
 
 - **Somente WebSocket**: sem fallback para long-polling.

@@ -14,7 +14,7 @@ encontrados, como validar e os commits correspondentes.
 | 3 | Conta e sessão | Concluída |
 | 4 | Catálogo e detalhe | Concluída |
 | 5 | Carrinho e cotação | Concluída |
-| 6 | Tempo real | Pendente |
+| 6 | Tempo real | Concluída (itens de checkout seguem na etapa 7) |
 | 7 | Checkout e pedido | Pendente |
 | 8 | Perfil e carteiras | Pendente |
 | 9 | Testes, Lighthouse, deploy e documentação final | Pendente |
@@ -260,5 +260,54 @@ na rede Ethereum até o pagamento, desfazer em vez de diálogo, coluna "Quantida
 - **Nomes truncados no mobile** (390 px) → fonte e imagem menores na linha.
 
 **Validação:** `npm run build`, `npm run lint`, `npm run test:e2e`.
+
+**Commit:** `3f206d8`.
+
+---
+
+## Etapa 6 — Tempo real
+
+**Objetivo:** aplicar os eventos Socket.IO (`nft.updated`, `order.updated`) ao estado da
+interface, com tolerância a duplicatas, eventos antigos e quedas (enunciado §7).
+
+**Entregue:**
+- `useRealtimeSync` (montado em `RealtimeConnection`): liga os eventos ao cache do TanStack
+  Query e remove os listeners no fim do ciclo de vida ou na troca de usuário.
+- **`nft.updated`:** atualiza cards do catálogo (listas e destaques) e o detalhe só se o
+  evento for mais novo que o dado em cache; no carrinho, recarrega carrinho e cotação da API
+  e avisa ("O preço de X (edição) mudou de A para B.", "esgotou", "agora tem só N") por toast
+  (região viva) e por um aviso persistente na tela do carrinho, que pode ser dispensado.
+  Quem está no detalhe do NFT também é avisado.
+- **`order.updated`:** grava o pedido no cache do usuário atual (sem regredir versão) e
+  invalida as listas de pedidos; a tela do pedido vem na etapa 7.
+- **Duplicatas e eventos antigos:** `EventTracker` descarta ids já vistos e versões menores
+  ou iguais à última aplicada por recurso; os avisos são derivados da diferença entre o
+  estado atual e o evento, então reaplicar não repete o efeito.
+- **Reconexão:** no evento `reconnect` do Manager do Socket.IO, catálogo, carrinho e dados do
+  usuário são revalidados na API REST.
+- **Carrinho:** diminuir a quantidade de um item acima do disponível vai direto ao novo
+  limite (a API recusa qualquer valor acima da disponibilidade).
+- Contrato do `nft.updated` passou a trazer `previousPrice` da edição padrão (card do catálogo).
+- Testes E2E: `e2e/realtime.spec.ts` (5 cenários × desktop e mobile); helpers do carrinho
+  extraídos para `e2e/cart-helpers.ts`.
+
+**Decisões:**
+- Carrinho e cotação não são ajustados no cliente a partir do evento: são recarregados da API,
+  que continua sendo a referência dos valores.
+- Reconciliação no `reconnect` (reconexão automática), não no `connect`: a troca de sessão
+  também reconecta o socket e já recarrega os dados privados por outro caminho.
+
+**Problemas encontrados:**
+- **"−" não funcionava com quantidade acima do disponível:** cada clique pedia uma quantidade
+  ainda acima do limite e a API respondia 409 → diminuir vai direto ao limite, que considera
+  também a disponibilidade informada pela cotação (ela pode chegar antes do carrinho).
+- **Junção do carrinho do visitante perdida:** uma consulta do carrinho iniciada antes da
+  junção podia sobrescrever o resultado → consultas em andamento são canceladas antes de
+  gravar o carrinho juntado.
+- **Specs antigos instáveis com a suíte maior** (primeiro carregamento > 5 s em paralelo) →
+  `expect.timeout` global de 10 s.
+
+**Validação:** `npm run build`, `npm run lint`, `npm run test:e2e` (82 testes; specs de tempo
+real repetidos 3×).
 
 **Commit:** (preenchido no próximo commit).

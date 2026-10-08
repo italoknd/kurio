@@ -18,7 +18,10 @@ export interface RealtimeEvent<TType extends string, TResource extends string, T
 
 export interface NftUpdatedData {
   nftId: string
+  /** Preço e preço anterior da edição padrão (os mesmos do card do catálogo). */
   price: EthAmount
+  previousPrice: EthAmount | null
+  /** Existe ao menos uma edição com unidades disponíveis. */
   available: boolean
   editions: { id: EditionId; price: EthAmount; previousPrice: EthAmount | null; available: number }[]
 }

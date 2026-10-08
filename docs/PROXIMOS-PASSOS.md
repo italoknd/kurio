@@ -4,8 +4,9 @@ Checklist vivo do que falta para concluir o desafio, organizado pelas etapas do 
 cruzado com o enunciado ([docs/DESAFIO.md](DESAFIO.md)). O histórico do que já foi feito
 está em [docs/PROGRESSO.md](PROGRESSO.md).
 
-**Situação em 08/10/2026:** etapas 0 a 5 concluídas (fundação, contratos e mocks, conta e
-sessão, catálogo e detalhe, carrinho e cotação). Próxima: etapa 6 (tempo real).
+**Situação em 08/10/2026:** etapas 0 a 5 concluídas e etapa 6 (tempo real) concluída no que
+não depende do checkout. Próxima: etapa 7 (checkout e pedido), que fecha os itens restantes
+da etapa 6.
 
 Legenda: ✅ feito · 🟡 parcial · ⬜ pendente
 
@@ -33,23 +34,24 @@ Tela `/carrinho` concluída (frames desktop-03 e mobile-03). Detalhes em
 | Versão mobile (lista em cards, cupom e resumo abaixo, botão fixo) | ✅ | Botão acompanha a rolagem |
 | Testes E2E (enunciado §9, item 5) | ✅ | `e2e/cart.spec.ts` |
 
-## Etapa 6 — Tempo real (Socket.IO)
+## Etapa 6 — Tempo real (Socket.IO) 🟡
 
-Base pronta: cliente autenticado pelo token, reconexão, aviso de queda, servidor simulado
-que publica `nft.updated` e `order.updated` com id estável e versão.
+Sincronização pronta (`features/realtime/use-realtime-sync.ts`). Restam os pontos que
+dependem da tela de pagamento/pedido (etapa 7). Detalhes em
+[PROGRESSO.md](PROGRESSO.md#etapa-6--tempo-real).
 
 | Requisito (enunciado §7) | Status | Observação |
 | --- | --- | --- |
-| `nft.updated` atualiza preço e disponibilidade no catálogo, detalhe e carrinho | ⬜ | Atualizar caches (`setQueryData`) e invalidar a cotação |
-| `order.updated` atualiza o estado do pedido | ⬜ | Cache `['user', id, 'order', orderId]` |
-| Tolerar duplicatas e eventos antigos (não regredir versão nem reaplicar efeitos) | ⬜ | Registrar ids vistos e última versão por recurso |
-| Reconciliar recursos ativos com a REST após reconexão | ⬜ | Invalidar consultas ativas no evento `connect` (exceto o primeiro) |
-| Eventos de sessão anterior não afetam outro usuário | 🟡 | Socket já reconecta com o novo token; falta descartar eventos na troca |
-| Liberar listeners e subscriptions ao fim do ciclo de vida | ⬜ | Hook com `socket.off` no cleanup |
-| Feedback acessível das alterações (aria-live) | ⬜ | "O preço de X mudou de A para B" |
-| Cenário: NFT no carrinho muda de preço → interface avisa e atualiza o resumo | ⬜ | Tela pronta: basta invalidar `['cart']` e a cotação no evento e avisar (aria-live) |
-| Checkout impede confirmação com cotação desatualizada | 🟡 | API já responde 409 `QUOTE_OUTDATED`; falta a interface |
-| Testes E2E (§9, itens 9 e 10) | ⬜ | Via `window.__kurioMocks.nfts.update`, `socket.replay`, `socket.setAvailable` |
+| `nft.updated` atualiza preço e disponibilidade no catálogo, detalhe e carrinho | ✅ | Catálogo/detalhe via `setQueryData` com versão; carrinho e cotação recarregados da API |
+| `order.updated` atualiza o estado do pedido | 🟡 | Cache `['user', id, 'order', orderId]` e listas atualizados; falta a tela do pedido (etapa 7) |
+| Tolerar duplicatas e eventos antigos (não regredir versão nem reaplicar efeitos) | ✅ | `EventTracker` (ids vistos + última versão por recurso) e versão do cache |
+| Reconciliar recursos ativos com a REST após reconexão | ✅ | Evento `reconnect` do Manager invalida catálogo, carrinho e dados do usuário |
+| Eventos de sessão anterior não afetam outro usuário | ✅ | Listeners refeitos por usuário; pedidos esquecidos e avisos limpos na troca |
+| Liberar listeners e subscriptions ao fim do ciclo de vida | ✅ | `socket.off` / `socket.io.off` no cleanup |
+| Feedback acessível das alterações (aria-live) | ✅ | Toast (região viva) + aviso persistente no carrinho |
+| Cenário: NFT no carrinho muda de preço → interface avisa e atualiza o resumo | ✅ | |
+| Checkout impede confirmação com cotação desatualizada | 🟡 | Carrinho bloqueia enquanto recalcula; falta o diálogo de reconfirmação no pagamento (409 `QUOTE_OUTDATED`) |
+| Testes E2E (§9, itens 9 e 10) | 🟡 | `e2e/realtime.spec.ts`; faltam os cenários durante o checkout e de pedido pendente (etapa 7) |
 
 ## Etapa 7 — Checkout e pedido
 
@@ -95,7 +97,7 @@ Layout da área (sidebar, "Sair") e lista de interesse já existem.
 
 | Requisito (enunciado §8–§12) | Status | Observação |
 | --- | --- | --- |
-| Testes E2E restantes (§9) | 🟡 | Feitos: itens 1, 2, 3, 4, 5, 11 (parcial) e 12. Faltam: 6–10 e o restante do 11 |
+| Testes E2E restantes (§9) | 🟡 | Feitos: itens 1–5, 12 e partes de 9, 10 e 11. Faltam: 6–8, o checkout em 9 e 10 e o restante do 11 |
 | Regressão visual (início, detalhe, carrinho, pagamento) com baselines versionadas | ⬜ | `toHaveScreenshot`, dados estáveis, desktop e mobile |
 | Controle de relógio, latência e disparo de eventos nos testes sensíveis a tempo | 🟡 | Latência e eventos controláveis; falta `page.clock` onde houver tempo |
 | Lighthouse em início e detalhe, mobile e desktop, 3 medições, mediana | ⬜ | Configuração versionada, relatórios HTML/JSON, LCP/CLS/TBT |
@@ -120,8 +122,13 @@ Layout da área (sidebar, "Sair") e lista de interesse já existem.
   houver export em resolução maior.
 - **Lupa do header:** leva ao catálogo, mas não foca o campo de busca.
 - **Lentidão dos testes em paralelo:** a primeira renderização após um carregamento completo
-  passa de 5 s com muitos workers; o carrinho usa uma espera de 15 s no carregamento inicial.
-  Avaliar `expect.timeout` global ou menos workers se outros specs ficarem instáveis.
+  passa de 5 s com muitos workers; `expect.timeout` global subiu para 10 s.
+- **Cotação antiga após remover item (não reproduzido):** uma execução da suíte mostrou o
+  resumo com a cotação anterior à remoção e o botão habilitado; não se repetiu em mais de 50
+  execuções isoladas e combinadas. Acompanhar; o checkout revalida a cotação na API (409
+  `QUOTE_OUTDATED`) de qualquer forma.
+- **Mudanças durante uma queda do socket** são reconciliadas pela REST, mas não geram o aviso
+  "o preço mudou" (não há evento para comparar).
 - **Junção do carrinho no login** roda depois de a sessão começar: se a página recarregar
   nesse intervalo, o `POST /cart/merge` é cancelado (o id do visitante é mantido e a junção é
   repetida no próximo login). Avaliar refazer a junção ao iniciar o app com sessão e id de
@@ -132,7 +139,7 @@ Layout da área (sidebar, "Sair") e lista de interesse já existem.
 ## Ordem sugerida
 
 1. ~~Etapa 5 (carrinho)~~ ✅
-2. Etapa 6 (tempo real), necessária para o cenário "preço muda durante a compra".
+2. ~~Etapa 6 (tempo real)~~ 🟡 (restante junto com a etapa 7)
 3. Etapa 7 (checkout e pedido), o fluxo mais crítico da avaliação.
 4. Etapa 8 (perfil e carteiras): o checkout depende de carteiras, mas os dados de exemplo da
    Ana já permitem desenvolver a etapa 7 antes.

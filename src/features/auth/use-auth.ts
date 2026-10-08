@@ -18,7 +18,10 @@ async function mergeGuestCart(session: Session, queryClient: ReturnType<typeof u
   try {
     const cart = await cartApi.merge(guestCartId)
     credentials.setGuestCartId(null)
+    // Uma consulta do carrinho iniciada antes da junção traria o carrinho sem os itens do visitante.
+    await queryClient.cancelQueries({ queryKey: queryKeys.cart(session.user.id), exact: true })
     queryClient.setQueryData(queryKeys.cart(session.user.id), cart)
+    void queryClient.invalidateQueries({ queryKey: [...queryKeys.cart(session.user.id), 'quote'] })
   } catch {
     // mantém o carrinho do visitante; a próxima autenticação tenta de novo
   }

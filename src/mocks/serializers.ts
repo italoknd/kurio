@@ -54,6 +54,7 @@ export function toNftUpdatedData(nft: NftRecord): NftUpdatedData {
   return {
     nftId: nft.id,
     price: nft.price,
+    previousPrice: nft.previousPrice,
     available: nft.available,
     editions: nft.editions.map((e) => ({
       id: e.id,

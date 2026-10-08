@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link, useNavigate, useRouter } from '@tanstack/react-router'
-import { AlertTriangle, ChevronLeft, ShoppingCart, Trash2 } from 'lucide-react'
+import { AlertTriangle, ChevronLeft, Info, ShoppingCart, Trash2, X } from 'lucide-react'
 import { useRef, type RefObject } from 'react'
 import { toast } from 'sonner'
 import { QuantityStepper } from '@/components/forms/quantity-stepper'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { cartNotices, useCartNotices } from '@/features/cart/cart-notices'
 import { CouponForm } from '@/features/cart/coupon-form'
 import {
   useAddToCart,
@@ -104,6 +105,7 @@ function CartContent({ cart, headingRef }: { cart: Cart; headingRef: RefObject<H
   return (
     <div className="container-site mt-4 grid gap-8 md:mt-2 lg:grid-cols-[minmax(0,1fr)_332px] lg:gap-[86px]">
       <section aria-labelledby="itens-titulo" className="min-w-0">
+        <CartChangeNotices itemIds={cart.items.map((item) => item.id)} />
         <h2 id="itens-titulo" className="sr-only">
           Itens ({cart.itemCount} {cart.itemCount === 1 ? 'unidade' : 'unidades'})
         </h2>
@@ -172,6 +174,35 @@ function CheckoutButton({ checkout }: { checkout: CheckoutState }) {
   )
 }
 
+/**
+ * Alterações recebidas em tempo real para itens do carrinho. O anúncio para leitores de
+ * tela é feito pelo toast; aqui o aviso permanece visível até ser dispensado.
+ */
+function CartChangeNotices({ itemIds }: { itemIds: string[] }) {
+  const notices = useCartNotices().filter((notice) => itemIds.includes(notice.id))
+  if (notices.length === 0) return null
+
+  return (
+    <div aria-label="Alterações nos itens" role="group" className="mb-4 flex flex-col gap-2">
+      {notices.map((notice) => (
+        <div key={notice.id} className="flex items-start gap-3 rounded-md border border-primary bg-card px-4 py-3 text-sm">
+          <Info className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+          <p className="flex-1">{notice.message} O resumo foi atualizado.</p>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => cartNotices.dismiss(notice.id)}
+            aria-label={`Dispensar aviso: ${notice.message}`}
+            className="-my-1 text-primary"
+          >
+            <X aria-hidden="true" />
+          </Button>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function issueMessage(issue: QuoteIssue) {
   if (issue.type === 'unavailable') return 'Esta edição esgotou. Remova o item para continuar.'
   return `Restam só ${issue.available} ${issue.available === 1 ? 'unidade' : 'unidades'}. Ajuste a quantidade para continuar.`
@@ -190,8 +221,13 @@ function CartItemRow({
   const remove = useRemoveCartItem()
   const addToCart = useAddToCart()
   const issueId = `item-${item.id}-problema`
+  // A cotação pode chegar antes do carrinho recarregado: vale o menor limite conhecido.
+  const limit = issue ? Math.min(item.maxQuantity, issue.available) : item.maxQuantity
 
-  function changeQuantity(quantity: number) {
+  function changeQuantity(requested: number) {
+    // Acima do disponível (ex.: após um evento), diminuir já vai direto ao novo limite:
+    // a API recusa qualquer quantidade maior que a disponibilidade.
+    const quantity = requested < item.quantity && limit > 0 ? Math.min(requested, limit) : requested
     update.mutate(quantity, { onError: (error) => toast.error(`${item.nft.name}: ${errorMessage(error)}`) })
   }
 
@@ -263,7 +299,7 @@ function CartItemRow({
       <div className="flex shrink-0 flex-col items-center justify-center gap-2 py-2 pr-2 md:flex-row md:justify-start md:p-0">
         <QuantityStepper
           value={item.quantity}
-          max={item.maxQuantity}
+          max={limit}
           onChange={changeQuantity}
           itemName={item.nft.name}
           size="sm"

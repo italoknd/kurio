@@ -1,48 +1,11 @@
-import type { Page } from '@playwright/test'
-import { expect, login, test, USERS, waitForMocks } from './fixtures'
+import { expectCartLoaded, openCartAs, PAGE_LOAD_TIMEOUT, row, summary, visible } from './cart-helpers'
+import { expect, test, USERS, waitForMocks } from './fixtures'
 
 /**
  * Carrinho e cotação (enunciado §9, item 5): itens e valores da API, quantidades
  * dentro da disponibilidade, remoção com desfazer, cupom válido/inválido/expirado,
  * itens com problema bloqueando a finalização e persistência após refresh e login.
  */
-
-/** Abre o carrinho já autenticado como o usuário (token gravado antes de carregar o app). */
-async function openCartAs(page: Page, user: keyof typeof USERS) {
-  await page.goto('/carrinho')
-  await waitForMocks(page)
-  const token = await login(page, user)
-  await page.evaluate((value) => localStorage.setItem('kurio:session-token', value), token)
-  await page.reload()
-  await waitForMocks(page)
-  await expectCartLoaded(page)
-}
-
-/** Primeira renderização após um carregamento completo (mais lenta com vários workers). */
-async function expectCartLoaded(page: Page) {
-  const loaded = page.getByRole('region', { name: 'Resumo da carteira' }).or(page.getByRole('heading', { name: 'Seu carrinho está vazio' }))
-  await expect(loaded).toBeVisible({ timeout: PAGE_LOAD_TIMEOUT })
-}
-
-const PAGE_LOAD_TIMEOUT = 15_000
-
-function row(page: Page, name: string) {
-  return page.getByRole('listitem').filter({ has: page.getByRole('link', { name, exact: true }) })
-}
-
-/** Valor de uma linha do resumo pelo início do rótulo (Subtotal, Desconto, Taxa de rede, Total). */
-function summary(page: Page, label: string) {
-  const startsWith = new RegExp(`^${label.replace(/[()]/g, '\\$&')}`)
-  return page
-    .getByRole('region', { name: 'Resumo da carteira' })
-    .locator('dl > div, dl > div > div')
-    .filter({ has: page.locator('dt', { hasText: startsWith }) })
-    .locator('dd')
-}
-
-function visible(locator: ReturnType<Page['getByRole']>) {
-  return locator.locator('visible=true')
-}
 
 test.describe('carrinho', () => {
   test('lista os itens com os valores da cotação da API', async ({ page }) => {
@@ -129,6 +92,7 @@ test.describe('carrinho', () => {
   })
 
   test('item esgotado é destacado e bloqueia a finalização', async ({ page }) => {
+    test.slow() // três carregamentos completos da página
     await openCartAs(page, 'ana')
     await page.evaluate(() => window.__kurioMocks!.nfts.update('violet-nomad-314', { editionId: '1-50', available: 0 }))
     await page.reload()

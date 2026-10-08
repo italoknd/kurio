@@ -170,7 +170,7 @@ Envelope de todo evento:
 
 | Evento | Destinatário | `data` |
 | --- | --- | --- |
-| `nft.updated` | Todas as conexões | `{ nftId, price, available, editions: [{ id, price, previousPrice, available }] }` |
+| `nft.updated` | Todas as conexões | `{ nftId, price, previousPrice, available, editions: [{ id, price, previousPrice, available }] }` |
 | `order.updated` | Só as conexões do dono do pedido (token válido) | `Order` completo |
 
 Toda alteração no banco simulado que muda preço/disponibilidade (cenários ou pedidos
