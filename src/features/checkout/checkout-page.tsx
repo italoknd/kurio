@@ -2,10 +2,11 @@ import { Link, useNavigate } from '@tanstack/react-router'
 import { AlertTriangle, Clock, Wallet as WalletIcon } from 'lucide-react'
 import { useEffect, useId, useState } from 'react'
 import { Controller, useForm, useWatch, type UseFormReturn } from 'react-hook-form'
+import { EnsField } from '@/components/forms/ens-field'
+import { SelectField } from '@/components/forms/select-field'
 import { TextField } from '@/components/forms/text-field'
 import { Button } from '@/components/ui/button'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import { useSession } from '@/features/auth/session'
@@ -287,8 +288,7 @@ function CollectorForm({
 }) {
   const { errors } = form.formState
   const c = errors.collector
-  const networkId = useId()
-  const ensId = useId()
+  const noteId = useId()
 
   return (
     <form id={FORM_ID} onSubmit={onSubmit} noValidate aria-labelledby="perfil-colecionador" className="min-w-0">
@@ -297,72 +297,40 @@ function CollectorForm({
         <TextField label="Nome de exibição" required autoComplete="name" error={c?.displayName?.message} {...form.register('collector.displayName')} />
         <TextField label="Nome de usuário" required autoComplete="username" error={c?.username?.message} {...form.register('collector.username')} />
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor={networkId} className="text-sm">
-            Rede<span className="ml-0.5 text-required" aria-hidden="true">*</span>
-          </label>
-          <Controller
-            control={form.control}
-            name="network"
-            render={({ field }) => (
-              <Select value={field.value} onValueChange={(value) => field.onChange(value as NftNetwork)} disabled={wallets.length === 0}>
-                <SelectTrigger
-                  id={networkId}
-                  aria-required
-                  aria-invalid={errors.network ? true : undefined}
-                  aria-describedby={errors.network ? `${networkId}-erro` : undefined}
-                  className="w-full"
-                >
-                  <SelectValue placeholder="Selecione uma rede" />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(NFT_NETWORKS).map(([id, label]) => (
-                    <SelectItem key={id} value={id}>{label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
-          />
-          {errors.network && <p id={`${networkId}-erro`} className="text-xs text-destructive">{errors.network.message}</p>}
-        </div>
+        <Controller
+          control={form.control}
+          name="network"
+          render={({ field }) => (
+            <SelectField
+              label="Rede"
+              required
+              value={field.value}
+              onChange={field.onChange}
+              options={NFT_NETWORKS}
+              placeholder="Selecione uma rede"
+              disabled={wallets.length === 0}
+              error={errors.network?.message}
+            />
+          )}
+        />
         <TextField label="Nome do perfil" required error={c?.profileName?.message} {...form.register('collector.profileName')} />
 
         <TextField label="Código de indicação" required error={c?.referralCode?.message} {...form.register('collector.referralCode')} />
         <TextField label="E-mail" required type="email" autoComplete="email" error={c?.email?.message} {...form.register('collector.email')} />
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor={ensId} className="text-sm">
-            Nome ENS<span className="ml-0.5 text-required" aria-hidden="true">*</span>
-          </label>
-          <div className="flex items-center">
-            <input
-              id={ensId}
-              aria-required
-              aria-invalid={c?.ensName ? true : undefined}
-              aria-describedby={c?.ensName ? `${ensId}-erro` : `${ensId}-sufixo`}
-              autoComplete="off"
-              spellCheck={false}
-              className="h-10 min-w-0 flex-1 rounded-l-md border border-r-0 border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 aria-invalid:border-destructive"
-              {...form.register('collector.ensName')}
-            />
-            <span id={`${ensId}-sufixo`} className="flex h-10 items-center rounded-r-md border border-input px-3 text-sm text-muted-foreground">
-              .eth
-            </span>
-          </div>
-          {c?.ensName && <p id={`${ensId}-erro`} className="text-xs text-destructive">{c.ensName.message}</p>}
-        </div>
+        <EnsField label="Nome ENS" required error={c?.ensName?.message} {...form.register('collector.ensName')} />
 
         <div className="flex flex-col gap-2 md:col-span-2">
-          <label htmlFor={`${ensId}-obs`} className="text-sm">Observação do colecionador (opcional)</label>
+          <label htmlFor={noteId} className="text-sm">Observação do colecionador (opcional)</label>
           <Textarea
-            id={`${ensId}-obs`}
+            id={noteId}
             rows={5}
             aria-invalid={c?.note ? true : undefined}
-            aria-describedby={c?.note ? `${ensId}-obs-erro` : undefined}
+            aria-describedby={c?.note ? `${noteId}-erro` : undefined}
             className="md:max-w-[350px]"
             {...form.register('collector.note')}
           />
-          {c?.note && <p id={`${ensId}-obs-erro`} className="text-xs text-destructive">{c.note.message}</p>}
+          {c?.note && <p id={`${noteId}-erro`} className="text-xs text-destructive">{c.note.message}</p>}
         </div>
       </div>
     </form>

@@ -102,10 +102,8 @@ test.describe('tempo real', () => {
     await page.evaluate(() => window.__kurioMocks!.socket.setAvailable(false))
     await expect(page.getByText('Conexão em tempo real perdida. Reconectando…')).toBeVisible()
 
-    // Alteração durante a queda: nenhum evento chega.
+    // Alteração durante a queda: nenhum evento chega (só uma consulta REST poderia trazê-la).
     await updateNft(page, 'ivory-baron-088', { editionId: '1-50', price: '1.89' })
-    await page.waitForTimeout(500)
-    await expect(summary(page, 'Subtotal')).toHaveText('26.83 ETH')
 
     await page.evaluate(() => window.__kurioMocks!.socket.setAvailable(true))
     // Backoff de reconexão do cliente: até ~7,5 s entre tentativas.

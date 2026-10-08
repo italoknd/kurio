@@ -4,8 +4,8 @@ Checklist vivo do que falta para concluir o desafio, organizado pelas etapas do 
 cruzado com o enunciado ([docs/DESAFIO.md](DESAFIO.md)). O histórico do que já foi feito
 está em [docs/PROGRESSO.md](PROGRESSO.md).
 
-**Situação em 08/10/2026:** etapas 0 a 7 concluídas (até checkout e pedido). Próxima:
-etapa 8 (perfil e carteiras).
+**Situação em 08/10/2026:** etapas 0 a 8 concluídas (todas as telas e fluxos). Próxima:
+etapa 9 (qualidade, regressão visual, Lighthouse, deploy e documentação final).
 
 Legenda: ✅ feito · 🟡 parcial · ⬜ pendente
 
@@ -73,28 +73,27 @@ Telas `/pagamento` e `/pedidos/$orderId` concluídas. Detalhes em
 | Sessão expirada no checkout preserva o contexto | ✅ | Rascunho do formulário por usuário |
 | Testes E2E (§9, itens 6, 7 e 10) | ✅ | `e2e/checkout.spec.ts` |
 
-## Etapa 8 — Perfil e carteiras
+## Etapa 8 — Perfil e carteiras ✅
 
-Telas: [desktop-08-perfil.png](figma/desktop-08-perfil.png) e
-[desktop-09-carteiras.png](figma/desktop-09-carteiras.png) (sem frame mobile: adaptar).
-Layout da área (sidebar, "Sair") e lista de interesse já existem.
+Telas `/perfil` e `/perfil/carteiras` concluídas (frames desktop-08 e desktop-09, adaptadas
+para tablet e mobile). Detalhes em [PROGRESSO.md](PROGRESSO.md#etapa-8--perfil-e-carteiras).
 
 | Requisito (enunciado §3) | Status | Observação |
 | --- | --- | --- |
-| Editar dados do perfil com validação e erros da API (conflito de e-mail/usuário) | ⬜ | `PATCH /profile` |
-| Avatar: alterar (upload até 1 MB) e remover | ⬜ | `PUT`/`DELETE /profile/avatar`; atualizar header |
-| Alterar senha (atual, nova, confirmação) | ⬜ | `POST /profile/password` |
-| Carteira principal: cadastro e edição | ⬜ | `POST`/`PUT /wallets` |
-| Carteira secundária: cadastro, edição e "Igual à carteira principal" | ⬜ | |
-| Alterações confirmadas permanecem após refresh | 🟡 | Persistência pronta no mock |
-| Versões mobile e tablet | ⬜ | |
-| Testes E2E (§9, item 8) | ⬜ | Perfil, avatar, senha e carteiras com erros de validação |
+| Editar dados do perfil com validação e erros da API (conflito de e-mail/usuário) | ✅ | Header e menu atualizados na hora |
+| Avatar: alterar (upload até 1 MB) e remover | ✅ | Tipo e tamanho validados antes do envio |
+| Alterar senha (atual, nova, confirmação) | ✅ | |
+| Carteira principal: cadastro e edição | ✅ | |
+| Carteira secundária: cadastro, edição e "Igual à carteira principal" | ✅ | Copia os dados da principal para ajuste |
+| Alterações confirmadas permanecem após refresh | ✅ | |
+| Versões mobile e tablet | ✅ | Formulários em uma coluna no mobile |
+| Testes E2E (§9, item 8) | ✅ | `e2e/profile.spec.ts` |
 
 ## Etapa 9 — Qualidade, entrega e documentação final
 
 | Requisito (enunciado §8–§12) | Status | Observação |
 | --- | --- | --- |
-| Testes E2E restantes (§9) | 🟡 | Feitos: itens 1–7, 9, 10, 12 e parte do 11. Faltam: 8 e o restante do 11 |
+| Testes E2E restantes (§9) | 🟡 | Feitos: itens 1–10, 12 e parte do 11. Falta: auditoria de teclado/foco em todas as telas (item 11) |
 | Regressão visual (início, detalhe, carrinho, pagamento) com baselines versionadas | ⬜ | `toHaveScreenshot`, dados estáveis, desktop e mobile |
 | Controle de relógio, latência e disparo de eventos nos testes sensíveis a tempo | 🟡 | Latência e eventos controláveis; falta `page.clock` onde houver tempo |
 | Lighthouse em início e detalhe, mobile e desktop, 3 medições, mediana | ⬜ | Configuração versionada, relatórios HTML/JSON, LCP/CLS/TBT |
@@ -142,6 +141,5 @@ Layout da área (sidebar, "Sair") e lista de interesse já existem.
 1. ~~Etapa 5 (carrinho)~~ ✅
 2. ~~Etapa 6 (tempo real)~~ ✅
 3. ~~Etapa 7 (checkout e pedido)~~ ✅
-4. Etapa 8 (perfil e carteiras): o checkout depende de carteiras, mas os dados de exemplo da
-   Ana já permitem desenvolver a etapa 7 antes.
+4. ~~Etapa 8 (perfil e carteiras)~~ ✅
 5. Etapa 9 (testes restantes, regressão visual, Lighthouse, deploy e documentação).

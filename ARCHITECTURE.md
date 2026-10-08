@@ -282,6 +282,12 @@ de validação espelham as da API para feedback imediato; erros por campo vindos
 - **Confirmação:** o recibo do frame 05 é uma página (`/pedidos/$id`), não um modal, para
   funcionar em acesso direto e refresh; estados pendente e recusado seguem o mesmo padrão
   visual.
+- **Perfil:** "Alterar senha" tem botão próprio (o Figma usa um único "Salvar"); o nome ENS
+  do perfil é opcional, conforme a API; o seletor ".eth" do Figma virou sufixo fixo do campo.
+- **Carteiras:** "Adicionar" abre o formulário da carteira ainda não cadastrada; "Igual à
+  carteira principal" fica no formulário da secundária e copia os dados para ajuste.
+- **Área do colecionador no mobile/tablet** (sem frame): menu lateral acima do conteúdo e
+  formulários em uma coluna.
 - **Estado autenticado do header** (sem frame): avatar com inicial e menu da conta.
 - **Mobile do login/cadastro e do detalhe:** sem barra inferior (como nos frames); o detalhe
   usa a barra fixa de compra do frame mobile-02.

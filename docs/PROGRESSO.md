@@ -16,7 +16,7 @@ encontrados, como validar e os commits correspondentes.
 | 5 | Carrinho e cotação | Concluída |
 | 6 | Tempo real | Concluída |
 | 7 | Checkout e pedido | Concluída |
-| 8 | Perfil e carteiras | Pendente |
+| 8 | Perfil e carteiras | Concluída |
 | 9 | Testes, Lighthouse, deploy e documentação final | Pendente |
 
 Requisitos que faltam, por etapa, e pendências técnicas: [docs/PROXIMOS-PASSOS.md](PROXIMOS-PASSOS.md).
@@ -355,6 +355,44 @@ envio idempotente e acompanhamento do pedido até o recibo (frame desktop-05).
   (assíncrona) → gravação síncrona antes de `mutate` + envios em série.
 - Avisos do lint do React Compiler (`form.watch`, ref em handler) → `useWatch`,
   `form.subscribe` e foco por id.
+
+**Validação:** `npm run build`, `npm run lint`, `npm run test:e2e`.
+
+**Commit:** `09725a4`.
+
+---
+
+## Etapa 8 — Perfil e carteiras
+
+**Objetivo:** área do colecionador com dados do perfil, avatar, senha e carteiras principal e
+secundária (frames desktop-08 e desktop-09), funcionando também em tablet e mobile.
+
+**Entregue:**
+- **Dados do perfil:** nome de exibição, usuário, e-mail, nome ENS e apelido da carteira, com
+  validação local e erros da API por campo (e-mail/usuário já em uso); ao salvar, o usuário da
+  sessão é atualizado (header e menu na hora).
+- **Avatar:** PNG, JPEG ou WebP de até 1 MB, validado antes do envio (e pela API); alterar e
+  remover.
+- **Senha:** atual, nova e confirmação, com "senha atual incorreta" vindo da API.
+- **Carteiras:** formulários da principal e da secundária (cadastro e edição); "Igual à
+  carteira principal" copia os dados da principal para a secundária, que podem ser ajustados
+  antes de salvar. A lista em cache (usada no pagamento) é atualizada com a resposta.
+- Componentes de formulário reaproveitáveis: `EnsField` (sufixo ".eth") e `SelectField`
+  (select com rótulo e erro), também usados no pagamento.
+- Testes E2E: `e2e/profile.spec.ts` (5 cenários × desktop e mobile).
+
+**Decisões:**
+- Senha com botão próprio ("Alterar senha") em vez de um único "Salvar" para tudo: são
+  operações independentes na API, com erros próprios.
+- Nome ENS do perfil é opcional (contrato da API), ao contrário do asterisco do Figma.
+- Avatar é enviado ao escolher o arquivo (sem etapa extra de confirmação).
+
+**Problemas encontrados:**
+- Tipagem do formulário de carteira com rede/tipo ainda não escolhidos (`''`): uso de
+  `z.input`/`z.output` no `useForm` em vez de cast.
+- Teste de reconexão instável: supunha que nada mudaria durante a queda do socket, mas uma
+  consulta REST automática pode trazer o valor novo antes → a verificação foi removida; a
+  reconciliação após reconectar continua testada.
 
 **Validação:** `npm run build`, `npm run lint`, `npm run test:e2e`.
 
