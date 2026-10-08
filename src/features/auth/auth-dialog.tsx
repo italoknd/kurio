@@ -1,9 +1,7 @@
 import { useNavigate, useSearch } from '@tanstack/react-router'
-import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { LoginForm, RegisterForm, SocialLogin } from '@/features/auth/auth-forms'
 import { cn } from '@/lib/utils'
-import type { Session } from '@/types/auth'
 
 export type AuthMode = 'entrar' | 'cadastro'
 
@@ -25,8 +23,7 @@ export function AuthDialog() {
     void navigate({ to: '.', search: (prev) => ({ ...prev, auth: next }), replace: next !== undefined && mode !== undefined })
   }
 
-  function handleSuccess(session: Session) {
-    toast.success(`Olá, ${session.user.displayName}!`)
+  function handleSuccess() {
     setMode(undefined)
   }
 

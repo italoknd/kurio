@@ -1,6 +1,6 @@
 import { delay, HttpResponse } from 'msw'
 import { env } from '@/lib/env'
-import { getMockConfig, nextRandom } from '@/mocks/config'
+import { getMockConfig, nextRandom, type NetworkProfile } from '@/mocks/config'
 import type { ApiErrorBody, ApiErrorCode, ConflictReason } from '@/types/api'
 
 /** Monta a URL absoluta de uma rota REST, respeitando VITE_API_URL. */
@@ -42,40 +42,47 @@ export function clearForcedFailures() {
   forcedFailures.length = 0
 }
 
+/** Latência do perfil de rede atual, em ms (`null` = sem resposta antes do timeout). */
+function latencyFor(network: NetworkProfile): number | null {
+  switch (network) {
+    case 'timeout':
+      return null
+    case 'lento':
+      return 2500
+    case 'variavel':
+      return 50 + Math.round(nextRandom() * 2950)
+    default:
+      return 150
+  }
+}
+
 /**
  * Aplica as condições de rede configuradas a uma requisição. Retorna uma
  * resposta de falha quando a requisição deve falhar, ou `undefined` para seguir
  * para o handler. Deve ser chamada no início de todo handler REST.
+ * Falhas forçadas (`failNext`) também respeitam a latência do perfil.
  */
 export async function simulateNetwork(request: Request): Promise<Response | undefined> {
   const { network } = getMockConfig()
+  if (network === 'offline') return HttpResponse.error()
+
+  const latency = latencyFor(network)
+  if (latency === null) {
+    await delay(env.httpTimeout + 2000)
+    return errorResponse(504, 'UNAVAILABLE', 'Tempo esgotado.')
+  }
+  await delay(latency)
 
   const pathname = new URL(request.url).pathname
   const forced = forcedFailures.find((f) => f.method === request.method && f.path.test(pathname))
   if (forced) {
     forced.remaining -= 1
     if (forced.remaining <= 0) forcedFailures.splice(forcedFailures.indexOf(forced), 1)
-    await delay(150)
     return errorResponse(forced.status, forced.code, 'Falha simulada pelo cenário de testes.')
   }
 
-  switch (network) {
-    case 'offline':
-      return HttpResponse.error()
-    case 'timeout':
-      await delay(env.httpTimeout + 2000)
-      return errorResponse(504, 'UNAVAILABLE', 'Tempo esgotado.')
-    case 'lento':
-      await delay(2500)
-      return undefined
-    case 'variavel':
-      await delay(50 + Math.round(nextRandom() * 2950))
-      return undefined
-    case 'instavel':
-      await delay(150)
-      return nextRandom() < 0.3 ? errorResponse(503, 'UNAVAILABLE', 'Serviço temporariamente indisponível.') : undefined
-    default:
-      await delay(150)
-      return undefined
+  if (network === 'instavel' && nextRandom() < 0.3) {
+    return errorResponse(503, 'UNAVAILABLE', 'Serviço temporariamente indisponível.')
   }
+  return undefined
 }

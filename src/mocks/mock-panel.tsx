@@ -39,11 +39,11 @@ export default function MockPanel() {
         <Button
           variant="outline"
           size="sm"
-          className="fixed bottom-20 left-4 z-50 bg-background md:bottom-4"
+          className="fixed top-1/2 right-0 z-50 size-9 rounded-r-none bg-background p-0 md:top-auto md:right-auto md:bottom-4 md:left-4 md:size-auto md:rounded-md md:px-2.5"
           aria-label="Abrir painel de cenários dos mocks"
         >
           <FlaskConical aria-hidden="true" />
-          Cenários
+          <span className="hidden md:inline">Cenários</span>
         </Button>
       </SheetTrigger>
       <SheetContent side="left" className="overflow-y-auto">

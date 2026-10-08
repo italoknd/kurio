@@ -12,7 +12,7 @@ encontrados, como validar e os commits correspondentes.
 | 1 | Fundação (stack obrigatória, tema, layout, mocks, Playwright) | Concluída |
 | 2 | Contratos e mocks (tipos, fixtures, handlers REST, eventos) | Concluída |
 | 3 | Conta e sessão | Concluída |
-| 4 | Catálogo e detalhe | Pendente |
+| 4 | Catálogo e detalhe | Concluída |
 | 5 | Carrinho e cotação | Pendente |
 | 6 | Tempo real | Pendente |
 | 7 | Checkout e pedido | Pendente |
@@ -165,3 +165,55 @@ expiração tratada sem perder o contexto e isolamento entre usuários.
 
 **Validação:** `npm run build`, `npm run lint`, `npm run test:e2e` (38 testes; testes de
 sessão repetidos 5× sem falhas).
+
+**Commit:** `e4e19f3`.
+
+---
+
+## Etapa 4 — Catálogo e detalhe
+
+**Objetivo:** página inicial com destaques e catálogo (busca, filtros, ordenação, paginação
+na URL), detalhe do NFT com galeria, edições, quantidade, favoritos e compra.
+
+**Entregue:**
+- **Início** fiel ao frame desktop-01: destaque com troca pelos pontos, sidebar de coleções
+  com contagens, faixa de preço (slider) e redes, card "NFT em destaque", abas, ordenação,
+  grid de 9 por página, paginação, banners editoriais e "Diário da Cunhagem". No mobile:
+  busca "Explorar coleções" no topo com drawer de filtros e grid de 2 colunas (frame mobile-01).
+- **Estado do catálogo na URL**, sobrevivendo a refresh e ao histórico; filtros combináveis;
+  mudança de filtro reinicia a paginação.
+- **Estados de dados:** skeleton com shimmer, vazio, erro com nova tentativa e atualização
+  em segundo plano (resultados anteriores esmaecidos).
+- **Detalhe** fiel aos frames desktop-02 e mobile-02: galeria com miniaturas e zoom, preço por
+  edição, avaliação, edições (esgotadas marcadas), quantidade limitada pela disponibilidade e
+  pelo limite por pedido, compra (adiciona ao carrinho e vai para ele), favoritar,
+  compartilhar, abas de detalhes e "Mais desta coleção". Acesso direto e 404 próprio.
+- **Favoritos** com atualização otimista, rollback e aviso em falha; persistidos na API; lista
+  em `/perfil/favoritos`.
+- **Carrinho do visitante** iniciado ao comprar (id guardado para refresh e login) e contador
+  no header.
+- Testes E2E: `e2e/catalog.spec.ts` e `e2e/nft-detail.spec.ts` (desktop e mobile).
+
+**Decisões:**
+- Campo de busca adicionado acima do grid no desktop (o Figma só tem a lupa).
+- Sem rotação automática no destaque; "Mais desta coleção" como grade/rolagem.
+- Fixtures versionadas (`FIXTURES_VERSION`): ao mudar os dados simulados, estados salvos no
+  navegador são substituídos automaticamente.
+- Falhas forçadas (`failNext`) passaram a respeitar a latência do perfil de rede, para testes
+  de atualização otimista determinísticos.
+
+**Problemas encontrados:**
+- **Rollback de favorito falhava** quando o clique acontecia com a lista ainda carregando
+  (snapshot vazio + `setQueryData(undefined)` ignorado) → reversão da operação + `onSettled`.
+  Encontrado pelo trace do Playwright (requisição de favoritos cancelada).
+- **Toast de boas-vindas sumiu:** com o merge do carrinho do visitante, o login passou a
+  aguardar uma requisição extra e a página de login desmontava antes do callback de
+  `mutate()` → toast movido para o callback do hook.
+- **Toasts cobriam a barra superior no mobile** (voltar/favoritar) → deslocados para baixo dela.
+- **Nome acessível do botão "Favoritar"** não identificava o NFT → passou a conter o texto
+  visível e o nome do NFT (WCAG 2.5.3).
+- Testes liam a lista enquanto os dados anteriores ainda eram exibidos → espera pelo status
+  anunciado ("N NFTs encontrados") e `expect.poll`.
+
+**Validação:** `npm run build`, `npm run lint`, `npm run test:e2e` (58 testes; catálogo e
+detalhe repetidos 3× sem falhas).

@@ -66,6 +66,18 @@ export function minEth(a: EthAmount, b: EthAmount): EthAmount {
   return compareEth(a, b) <= 0 ? a : b
 }
 
+const WEI_PER_CENT = WEI_PER_ETH / 100n
+
+/** Valor em centésimos de ETH (inteiro), para controles como sliders. Arredonda para baixo. */
+export function toCents(amount: EthAmount): number {
+  return Number(toWei(amount) / WEI_PER_CENT)
+}
+
+export function fromCents(cents: number): EthAmount {
+  if (!Number.isInteger(cents)) throw new Error('Centésimos devem ser inteiros')
+  return fromWei(BigInt(cents) * WEI_PER_CENT)
+}
+
 /** Texto para exibição: "1.19 ETH". */
 export function formatEth(amount: EthAmount): string {
   return `${normalizeEth(amount)} ETH`

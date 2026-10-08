@@ -69,7 +69,8 @@ export interface IdempotencyRecord {
 }
 
 export interface DbState {
-  schemaVersion: 1
+  /** Versão das fixtures; estados salvos com outra versão são descartados. */
+  schemaVersion: number
   users: UserRecord[]
   sessions: SessionRecord[]
   nfts: NftRecord[]

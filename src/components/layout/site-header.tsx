@@ -1,6 +1,7 @@
 import { Link, useRouterState } from '@tanstack/react-router'
 import { LogIn, Search, ShoppingCart } from 'lucide-react'
 import { useSession } from '@/features/auth/session'
+import { useCart } from '@/features/cart/use-cart'
 import { UserMenu } from '@/features/auth/user-menu'
 import { cn } from '@/lib/utils'
 import { notifyUnavailable } from '@/lib/unavailable'
@@ -12,6 +13,7 @@ export function SiteHeader() {
   const isMarket = MARKET_PATHS.some((path) => pathname.startsWith(path))
   const isHome = pathname === '/'
   const { user, isPending } = useSession()
+  const itemCount = useCart().data?.itemCount ?? 0
 
   return (
     <header className="hidden md:block">
@@ -35,8 +37,17 @@ export function SiteHeader() {
           <Link to="/" hash="catalogo" aria-label="Buscar NFTs" className="rounded-sm p-1 hover:text-primary">
             <Search className="size-6" aria-hidden="true" />
           </Link>
-          <Link to="/carrinho" aria-label="Carrinho" className="relative rounded-sm p-1 hover:text-primary">
+          <Link
+            to="/carrinho"
+            aria-label={itemCount > 0 ? `Carrinho, ${itemCount} ${itemCount === 1 ? 'item' : 'itens'}` : 'Carrinho'}
+            className="relative rounded-sm p-1 hover:text-primary"
+          >
             <ShoppingCart className="size-6" aria-hidden="true" />
+            {itemCount > 0 && (
+              <span aria-hidden="true" className="absolute -top-0.5 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
+                {itemCount > 99 ? '99+' : itemCount}
+              </span>
+            )}
           </Link>
           {isPending ? (
             <span className="h-9 w-24" aria-hidden="true" />

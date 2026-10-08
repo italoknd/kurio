@@ -1,11 +1,9 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
-import { toast } from 'sonner'
 import { LoginForm, RegisterForm, SocialLogin } from '@/features/auth/auth-forms'
 import { safeRedirect } from '@/features/auth/guards'
 import { useSession } from '@/features/auth/session'
 import type { AuthMode } from '@/features/auth/auth-dialog'
-import type { Session } from '@/types/auth'
 
 interface AuthPageProps {
   mode: AuthMode
@@ -28,10 +26,6 @@ export function AuthPage({ mode, redirect, motivo }: AuthPageProps) {
     if (isAuthenticated) void navigate({ to: target, replace: true })
   }, [isAuthenticated, navigate, target])
 
-  function handleSuccess(session: Session) {
-    toast.success(`Olá, ${session.user.displayName}!`)
-  }
-
   const isLogin = mode === 'entrar'
 
   return (
@@ -50,9 +44,9 @@ export function AuthPage({ mode, redirect, motivo }: AuthPageProps) {
       )}
 
       {isLogin ? (
-        <LoginForm onSuccess={handleSuccess} />
+        <LoginForm />
       ) : (
-        <RegisterForm onSuccess={handleSuccess} submitLabel="Criar perfil" />
+        <RegisterForm submitLabel="Criar perfil" />
       )}
 
       <div className="mt-8">

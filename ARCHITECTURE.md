@@ -108,6 +108,38 @@ páginas cheias, como nos frames mobile.
   redirecionamentos em cadeia.
 - `mutateAsync` no "Sair": callbacks de `mutate()` não rodam se o componente desmonta.
 
+## Catálogo
+
+- **Estado na URL** (`features/catalog/search-params.ts`): `q`, `categoria`, `rede` (listas
+  separadas por vírgula), `precoMin`, `precoMax`, `aba`, `ordem`, `pagina`. Valores padrão
+  ficam fora da URL. Toda mudança gera entrada no histórico; mudar busca/filtro/ordem/aba
+  reinicia a paginação. A busca tem debounce de 400 ms (uma entrada por busca, não por tecla).
+- **Respostas fora de ordem:** cada combinação de parâmetros tem sua chave no TanStack Query;
+  a interface só lê a chave atual e o `signal` aborta a requisição obsoleta.
+- **Atualização em segundo plano:** `keepPreviousData` mantém a página anterior visível
+  (esmaecida, com "Atualizando resultados…") enquanto a nova carrega.
+- **Estados:** skeleton com shimmer nas mesmas dimensões do card; vazio com "limpar filtros";
+  erro com "Tentar novamente" (após os 2 retries automáticos de falha transitória).
+- **Faixa de preço:** o slider trabalha em centésimos inteiros de ETH (`toCents`/`fromCents`),
+  sem ponto flutuante; filtra pelo preço listado do card.
+- Loaders das rotas só disparam o prefetch (`void prefetchQuery`) e não bloqueiam a navegação,
+  para que os skeletons apareçam em redes lentas.
+
+## Favoritos (atualização otimista)
+
+`useToggleFavorite` marca/desmarca na hora (`onMutate`), reverte em caso de falha e avisa,
+e ressincroniza com a API ao final (`onSettled`). A reversão desfaz **a operação** (adiciona
+ou remove o id), e não restaura um snapshot: se o clique acontece enquanto a lista ainda
+carrega, o snapshot seria vazio e `setQueryData(undefined)` é ignorado pelo TanStack Query v5
+— bug real encontrado pelo teste de falha. Visitantes são levados ao modal de login.
+
+## Callbacks de mutation e desmontagem
+
+Ações que levam a outra página (login na página cheia, "Sair", comprar) colocam efeitos
+obrigatórios (toasts, atualização de cache) nos callbacks do `useMutation` ou após
+`mutateAsync`, nunca só nos callbacks de `mutate()`: estes não rodam se o componente
+desmontar antes da resposta.
+
 ## Formulários
 
 react-hook-form + zod, com um adaptador próprio (`lib/forms.ts`) em vez de
@@ -160,6 +192,23 @@ de validação espelham as da API para feedback imediato; erros por campo vindos
   resolução limitada a 434 px (Emerald Ape) e 238 px (demais).
 - Ícones de redes sociais: traçados do lucide v0 (ISC), pois o lucide v1 removeu ícones de marca.
 - Fonte Roboto Mono servida localmente via `@fontsource-variable/roboto-mono`.
+
+## Desvios e adaptações em relação ao Figma
+
+- **Busca no desktop:** o Figma só mostra a lupa no header; foi adicionado um campo de busca
+  acima do grid (a lupa leva a ele). No mobile, a busca "Explorar coleções" fica no topo,
+  como no frame, com o botão de filtros abrindo um drawer.
+- **Carrossel do topo:** troca manual pelos pontos, sem rotação automática (movimento
+  reduzido e controle do usuário).
+- **"Mais desta coleção":** grade (desktop) e rolagem horizontal (mobile) em vez de carrossel
+  com pontos.
+- **Botão flutuante central da barra inferior mobile:** omitido (sem função definida no escopo).
+- **Aba "Avaliações de colecionadores":** mostra a média e o total; comentários individuais
+  não fazem parte dos contratos.
+- **Preço anterior** aparece riscado e com rótulo para leitores de tela ("Preço anterior").
+- **Estado autenticado do header** (sem frame): avatar com inicial e menu da conta.
+- **Mobile do login/cadastro e do detalhe:** sem barra inferior (como nos frames); o detalhe
+  usa a barra fixa de compra do frame mobile-02.
 
 ## Ações fora do escopo
 

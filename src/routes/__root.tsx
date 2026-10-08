@@ -77,7 +77,8 @@ function RootLayout() {
       <RealtimeConnection />
       <SessionManager />
       <AuthDialog />
-      <Toaster position="top-center" />
+      {/* No mobile, abaixo da barra superior (voltar/favoritar) para não cobrir seus botões. */}
+      <Toaster position="top-center" mobileOffset={{ top: 72 }} />
       <Suspense>
         {MockPanel && <MockPanel />}
         {Devtools && <Devtools />}

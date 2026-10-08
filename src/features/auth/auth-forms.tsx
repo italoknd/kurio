@@ -10,10 +10,11 @@ import { notifyUnavailable } from '@/lib/unavailable'
 import type { Session } from '@/types/auth'
 
 interface FormProps {
-  onSuccess: (session: Session) => void
+  /** Chamado após autenticar (o aviso de boas-vindas fica no hook de login/cadastro). */
+  onSuccess?: (session: Session) => void
 }
 
-export function LoginForm({ onSuccess }: FormProps) {
+export function LoginForm({ onSuccess }: FormProps = {}) {
   const login = useLogin()
   const form = useForm<LoginValues>({ resolver: zodResolver(loginSchema), defaultValues: { email: '', password: '' } })
   const { errors } = form.formState
@@ -65,7 +66,7 @@ export function LoginForm({ onSuccess }: FormProps) {
   )
 }
 
-export function RegisterForm({ onSuccess, submitLabel = 'Criar conta' }: FormProps & { submitLabel?: string }) {
+export function RegisterForm({ onSuccess, submitLabel = 'Criar conta' }: FormProps & { submitLabel?: string } = {}) {
   const register = useRegister()
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),

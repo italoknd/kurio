@@ -28,6 +28,9 @@ function useStartSession() {
   const queryClient = useQueryClient()
   return async (session: Session) => {
     startSession(queryClient, session)
+    // Aqui (callback do hook) e não no mutate(): a página de login desmonta ao detectar a
+    // sessão, e callbacks do mutate() não rodam após desmontar.
+    toast.success(`Olá, ${session.user.displayName}!`)
     await mergeGuestCart(session, queryClient)
   }
 }

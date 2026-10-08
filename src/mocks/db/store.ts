@@ -1,4 +1,4 @@
-import { createSeedState } from '@/mocks/db/fixtures'
+import { createSeedState, FIXTURES_VERSION } from '@/mocks/db/fixtures'
 import type { DbState } from '@/mocks/db/types'
 
 /**
@@ -12,7 +12,7 @@ const STORAGE_KEY = 'kurio:mocks:db'
 function load(): DbState {
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? 'null') as DbState | null
-    if (stored?.schemaVersion === 1) return stored
+    if (stored?.schemaVersion === FIXTURES_VERSION) return stored
   } catch {
     // estado corrompido ou armazenamento indisponível: volta para as fixtures
   }

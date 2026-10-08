@@ -157,7 +157,8 @@ function buildNft(seed: NftSeed, index: number): NftRecord {
       address: `0x7A42${String(index).padStart(4, '0')}C3D19E8`,
       standard: seed.network === 'solana' ? 'SPL' : 'ERC-721',
     },
-    rating: { average: 4 + ((index * 3) % 10) / 10, count: 7 + ((index * 11) % 40) },
+    // Índice 0 (Emerald Ape) reproduz o Figma: 4.8 com 19 avaliações.
+    rating: { average: 4 + ((index * 3 + 8) % 10) / 10, count: 19 + ((index * 11) % 40) },
     editions,
     defaultEditionId,
     listedAt,
@@ -235,11 +236,14 @@ const COUPONS: CouponRecord[] = [
   { code: 'EXPIRADO', description: 'Cupom de 2025', percent: 20, expiresAt: '2025-01-01T00:00:00.000Z' },
 ]
 
+/** Incrementar ao mudar as fixtures: estados persistidos antigos são substituídos. */
+export const FIXTURES_VERSION = 2
+
 /** Estado inicial completo do banco simulado. */
 export function createSeedState(): DbState {
   const nfts = [...FIGMA_SEEDS, ...GENERATED_SEEDS].map(buildNft)
   return {
-    schemaVersion: 1,
+    schemaVersion: FIXTURES_VERSION,
     users: structuredClone(USERS),
     sessions: [],
     nfts,
