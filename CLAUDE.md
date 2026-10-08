@@ -55,9 +55,9 @@ implementar ou ajustar uma tela, abra o frame correspondente e compare o resulta
 Sempre que uma instrução/task do usuário for concluída e houver alterações no repositório:
 
 1. Validar antes de commitar:
-   - `npm run build` (type-check + build) deve passar
+   - `npm run build` (build + type-check) deve passar
    - `npm run lint` deve passar sem erros
-   - Testes Playwright relacionados à área alterada devem passar (quando existirem)
+   - `npm run test:e2e` deve passar (no mínimo os specs da área alterada)
    - Se falhar, corrigir; se não for possível corrigir, **não** commitar e informar o usuário.
 2. Revisar `git status` / `git diff` e adicionar somente os arquivos relacionados à task
    (nunca commitar `.env`, credenciais ou arquivos gerados como `dist/` e `node_modules/`).

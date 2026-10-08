@@ -1,11 +1,19 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { RouterProvider } from 'react-router'
-import { router } from '@/router'
+import { env } from '@/lib/env'
 import './index.css'
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>,
-)
+/**
+ * A aplicação só é importada depois que os mocks iniciam: o engine.io-client
+ * captura `globalThis.WebSocket` ao carregar o módulo, então o MSW precisa
+ * interceptar o WebSocket antes de o socket.io-client ser avaliado.
+ */
+async function bootstrap() {
+  if (env.enableMocks) {
+    const { startMocks } = await import('@/mocks/browser')
+    await startMocks()
+  }
+
+  const { renderApp } = await import('@/app')
+  renderApp(document.getElementById('root')!)
+}
+
+void bootstrap()
