@@ -1,6 +1,7 @@
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
-import { LoginForm, RegisterForm, SocialLogin } from '@/features/auth/auth-forms'
+import { LoginForm, RegisterForm } from '@/features/auth/auth-forms'
+import { SocialLogin } from '@/features/auth/social-login'
 import { cn } from '@/lib/utils'
 
 export type AuthMode = 'entrar' | 'cadastro'
@@ -55,7 +56,7 @@ export function AuthDialog() {
               {mode === 'entrar' ? <LoginForm onSuccess={handleSuccess} /> : <RegisterForm onSuccess={handleSuccess} />}
             </div>
             <div className="mt-8">
-              <SocialLogin />
+              <SocialLogin onSuccess={handleSuccess} />
             </div>
           </>
         )}

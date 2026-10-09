@@ -6,7 +6,7 @@ import { cartApi } from '@/api/cart'
 import { queryKeys } from '@/api/query-keys'
 import { endSession, startSession } from '@/features/auth/session'
 import { credentials } from '@/lib/credentials'
-import type { LoginRequest, RegisterRequest, Session } from '@/types/auth'
+import type { LoginRequest, RegisterRequest, Session, SocialLoginRequest } from '@/types/auth'
 
 /**
  * Leva o carrinho do visitante para a conta recém-autenticada. Falhas não
@@ -50,6 +50,15 @@ export function useRegister() {
   const start = useStartSession()
   return useMutation({
     mutationFn: (body: RegisterRequest) => authApi.register(body),
+    onSuccess: start,
+  })
+}
+
+/** Login social simulado: mesma retomada de sessão do login (inclui juntar o carrinho do visitante). */
+export function useSocialLogin() {
+  const start = useStartSession()
+  return useMutation({
+    mutationFn: (body: SocialLoginRequest) => authApi.social(body),
     onSuccess: start,
   })
 }

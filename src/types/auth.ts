@@ -24,6 +24,24 @@ export interface LoginRequest {
   password: string
 }
 
+/** Provedores do login social simulado (sem integração real com Google/Facebook). */
+export const SOCIAL_PROVIDERS = {
+  google: 'Google',
+  facebook: 'Facebook',
+} as const
+
+export type SocialProvider = keyof typeof SOCIAL_PROVIDERS
+
+/**
+ * POST /auth/social — conclusão simulada do login no provedor. Com uma conta Kurio
+ * já cadastrada com o e-mail, entra nela; senão, cria a conta (201).
+ */
+export interface SocialLoginRequest {
+  provider: SocialProvider
+  email: string
+  displayName: string
+}
+
 export interface RegisterRequest {
   username: string
   email: string

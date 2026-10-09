@@ -1,6 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
-import { LoginForm, RegisterForm, SocialLogin } from '@/features/auth/auth-forms'
+import { LoginForm, RegisterForm } from '@/features/auth/auth-forms'
+import { SocialLogin } from '@/features/auth/social-login'
 import { safeRedirect } from '@/features/auth/guards'
 import { useSession } from '@/features/auth/session'
 import type { AuthMode } from '@/features/auth/auth-dialog'

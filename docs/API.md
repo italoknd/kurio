@@ -46,6 +46,7 @@ No cliente, todo erro vira `HttpError` (`src/lib/http.ts`) com `kind` (o `code` 
 | --- | --- | --- | --- |
 | POST | `/auth/register` | `{ username, email, password }` | 201 `Session` · 422 · 409 `EMAIL_TAKEN`/`USERNAME_TAKEN` |
 | POST | `/auth/login` | `{ email, password }` | 200 `Session` · 422 · 401 |
+| POST | `/auth/social` | `{ provider: 'google' \| 'facebook', email, displayName }` | 200 `Session` (conta existente) · 201 `Session` (conta criada) · 422 · 403 (acesso negado no provedor, cenário) |
 | GET | `/auth/session` | — | 200 `Session` · 401 (expirada) |
 | POST | `/auth/logout` | — | 204 |
 

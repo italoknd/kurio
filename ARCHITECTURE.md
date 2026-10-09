@@ -93,6 +93,14 @@ catálogo (`['nfts', …]`) é público e permanece.
 | Tempo real | O socket reconecta com o novo token a cada mudança de sessão; eventos privados da sessão anterior param |
 | Carrinho do visitante | Ao autenticar, `POST /cart/merge` junta os itens à conta; falha não bloqueia o login |
 
+**Login social simulado.** Google e Facebook não têm integração real (fora do escopo, como
+as extensões de carteira), mas o fluxo funciona com dados simulados, no mesmo espírito da
+conexão de carteira: o botão abre um diálogo que faz o papel do provedor (nome e e-mail da
+conta, com sugestão fictícia), e `POST /auth/social` entra na conta Kurio com aquele e-mail ou
+cria uma nova (sem senha utilizável). A sessão começa como no login comum (junção do carrinho
+do visitante e retorno ao `redirect`). O cenário "negar acesso" (painel) simula a recusa no
+provedor (403).
+
 **Login em modal × página.** No desktop, "Entrar" abre um modal sobre a página atual
 (parâmetro `?auth=entrar|cadastro`, então "voltar" fecha o modal e o usuário continua onde
 estava). No mobile, e em redirecionamentos de rotas privadas, `/entrar` e `/cadastro` são
@@ -336,5 +344,7 @@ devem ser regeneradas com `npm run test:visual:update`.
 
 ## Ações fora do escopo
 
-Criadores, Aprenda, newsletter, central de ajuda, atividade, ofertas, downloads e suporte
-exibem um aviso de indisponibilidade (`lib/unavailable.ts`) e nunca simulam sucesso.
+Criadores, Aprenda, Diário da Cunhagem, newsletter, central de ajuda, atividade, ofertas,
+downloads, suporte e recuperação de senha exibem um aviso de indisponibilidade
+(`lib/unavailable.ts`) e nunca simulam sucesso. São páginas editoriais/de suporte excluídas
+pelo enunciado; a recuperação de senha dependeria de envio de e-mail, que não é simulado.

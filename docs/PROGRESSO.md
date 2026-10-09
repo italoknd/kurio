@@ -468,4 +468,34 @@ preparação do deploy.
 **Validação:** 16 verificações de fumaça passando contra o deploy; `npm run build`,
 `npm run lint`.
 
+**Commit:** `ace53de`.
+
+---
+
+## Revisão final — login social simulado
+
+**Objetivo:** revisar se "APIs, autenticação, carteiras e pagamentos funcionam com dados
+simulados" em todos os pontos da interface.
+
+**Diagnóstico:**
+- Varredura de todas as ações "indisponível": Criadores, Aprenda, Diário da Cunhagem,
+  newsletter, links do rodapé e Atividade/Ofertas/Arquivos/Suporte são páginas editoriais ou
+  de suporte excluídas pelo enunciado. **Google e Facebook**, porém, ficavam no caminho do
+  checkout (visitante → "Conectar e finalizar" → login) e só exibiam o aviso.
+- Varredura de erros em todas as telas (desktop e mobile, visitante e autenticado): nenhum
+  erro de script; só os 404 esperados de NFT e pedido inexistentes.
+
+**Entregue:**
+- `POST /auth/social` na API simulada (entra na conta existente pelo e-mail ou cria uma nova;
+  cenário "negar acesso" no painel → 403).
+- Diálogo do provedor simulado (`features/auth/social-login.tsx`) no modal e nas páginas de
+  login/cadastro; a sessão começa como no login comum (carrinho do visitante preservado,
+  retorno ao destino).
+- Testes E2E: visitante finaliza a compra entrando com Google (conta criada, carrinho
+  preservado, volta ao pagamento), entrada em conta existente e acesso negado.
+
+**Decisão:** "Esqueceu a senha?" continua indisponível (dependeria de envio de e-mail).
+
+**Validação:** `npm run build`, `npm run lint`, `npm run test:e2e`.
+
 **Commit:** (preenchido no próximo commit).

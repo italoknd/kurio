@@ -23,6 +23,8 @@ export interface MockConfig {
   payment: 'aprovar' | 'recusar'
   /** Resposta da carteira ao pedido de conexão. */
   walletConnection: 'aceitar' | 'recusar'
+  /** Resposta do provedor no login social simulado (Google/Facebook). */
+  socialLogin: 'aceitar' | 'recusar'
   /** Tempo entre a criação do pedido e a confirmação/recusa. */
   orderDelayMs: number
   /** Duração das novas sessões. */
@@ -35,6 +37,7 @@ const DEFAULT_CONFIG: MockConfig = {
   seed: 1,
   payment: 'aprovar',
   walletConnection: 'aceitar',
+  socialLogin: 'aceitar',
   orderDelayMs: 4000,
   sessionTtlMinutes: 60,
 }
@@ -55,6 +58,7 @@ function load(): MockConfig {
       seed: Number.isInteger(stored?.seed) ? stored!.seed! : DEFAULT_CONFIG.seed,
       payment: stored?.payment === 'recusar' ? 'recusar' : 'aprovar',
       walletConnection: stored?.walletConnection === 'recusar' ? 'recusar' : 'aceitar',
+      socialLogin: stored?.socialLogin === 'recusar' ? 'recusar' : 'aceitar',
       orderDelayMs: isPositiveInt(stored?.orderDelayMs) ? stored.orderDelayMs : DEFAULT_CONFIG.orderDelayMs,
       sessionTtlMinutes: isPositiveInt(stored?.sessionTtlMinutes)
         ? stored.sessionTtlMinutes

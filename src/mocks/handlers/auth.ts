@@ -16,7 +16,7 @@ import {
   USERNAME_PATTERN,
   validationError,
 } from '@/mocks/handlers/utils'
-import type { LoginRequest, RegisterRequest, Session } from '@/types/auth'
+import { SOCIAL_PROVIDERS, type LoginRequest, type RegisterRequest, type Session, type SocialLoginRequest } from '@/types/auth'
 
 function createSession(user: UserRecord): Session {
   const ttl = getMockConfig().sessionTtlMinutes * 60_000
@@ -28,6 +28,14 @@ function createSession(user: UserRecord): Session {
   db.state.sessions.push(record)
   commit()
   return { token: record.token, expiresAt: record.expiresAt, user: toUser(user) }
+}
+
+/** Usuário único a partir do e-mail (ex.: "colecionador.google@exemplo.com" → "colecionador.google"). */
+function usernameFromEmail(email: string) {
+  const base = (email.split('@')[0] ?? '').toLowerCase().replace(/[^a-z0-9._]/g, '').slice(0, 16).padEnd(3, '0')
+  let candidate = base
+  for (let n = 2; db.state.users.some((u) => u.username === candidate); n++) candidate = `${base}${n}`
+  return candidate
 }
 
 export const authHandlers = [
@@ -88,6 +96,47 @@ export const authHandlers = [
       return errorResponse(401, 'UNAUTHENTICATED', 'E-mail ou senha incorretos.')
     }
     return HttpResponse.json(createSession(user))
+  }),
+
+  /**
+   * Login social simulado: a interface faz o papel do provedor (Google/Facebook) e envia o
+   * e-mail e o nome "autorizados". Conta existente com o e-mail: entra nela; senão, cria.
+   * O cenário "recusar" simula o usuário negando o acesso no provedor.
+   */
+  route('post', '/auth/social', async ({ request }) => {
+    const body = await readJson<SocialLoginRequest>(request)
+    const email = text(body.email).toLowerCase()
+    const displayName = text(body.displayName)
+    const fields: Record<string, string> = {}
+    if (!body.provider || !(body.provider in SOCIAL_PROVIDERS)) fields.provider = 'Provedor inválido.'
+    if (!EMAIL_PATTERN.test(email)) fields.email = 'Informe um e-mail válido.'
+    if (displayName.length < 2) fields.displayName = 'Informe um nome com pelo menos 2 caracteres.'
+    if (Object.keys(fields).length > 0) return validationError(fields)
+
+    if (getMockConfig().socialLogin === 'recusar') {
+      return errorResponse(403, 'FORBIDDEN', `O acesso foi negado no ${SOCIAL_PROVIDERS[body.provider!]}.`)
+    }
+
+    const existing = db.state.users.find((u) => u.email === email)
+    if (existing) return HttpResponse.json(createSession(existing))
+
+    // Conta criada pelo provedor: sem senha utilizável (só entra pelo login social).
+    const salt = newId('salt')
+    const user: UserRecord = {
+      id: newId('usr'),
+      username: usernameFromEmail(email),
+      displayName,
+      email,
+      ensName: null,
+      walletNickname: null,
+      avatarUrl: null,
+      passwordSalt: salt,
+      passwordHash: await sha256Hex(`${salt}:${crypto.randomUUID()}`),
+    }
+    db.state.users.push(user)
+    db.state.favorites[user.id] = []
+    commit()
+    return HttpResponse.json(createSession(user), { status: 201 })
   }),
 
   route('get', '/auth/session', ({ request }) => {

@@ -131,6 +131,7 @@ para tablet e mobile). Detalhes em [PROGRESSO.md](PROGRESSO.md#etapa-8--perfil-e
   ignorar `.tanstack/`.
 - **Resolução das ilustrações:** limitadas ao export do Figma (434 px e 238 px); trocar se
   houver export em resolução maior.
+- **Recuperação de senha:** "Esqueceu a senha?" segue indisponível (dependeria de e-mail).
 - **Lupa do header:** leva ao catálogo, mas não foca o campo de busca.
 - **Lentidão dos testes em paralelo:** a primeira renderização após um carregamento completo
   passa de 5 s com muitos workers; `expect.timeout` global subiu para 10 s.

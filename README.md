@@ -65,6 +65,12 @@ A aplicação abre em `http://localhost:5173` com os mocks ativos.
 | `ana@kurio.dev` | `Colecione#1` | Carteiras principal e secundária, 2 favoritos e 3 itens no carrinho (valores do Figma) |
 | `bruno@kurio.dev` | `Colecione#2` | Conta sem carteiras, favoritos ou carrinho |
 
+**Login com Google/Facebook (simulado):** não há integração real com os provedores. O botão
+abre a "tela do provedor" simulada com uma conta fictícia sugerida
+(`colecionador.google@exemplo.com`, por exemplo): ao autorizar, a API simulada cria a conta
+ou, se o e-mail já existir (ex.: `ana@kurio.dev`), entra nela. Contas criadas assim não têm
+senha utilizável — entram só pelo login social.
+
 ## Dados simulados
 
 - **Catálogo:** 36 NFTs (9 do Figma + 27 gerados), 9 categorias, 3 redes, preços de 0.02 a
@@ -101,7 +107,8 @@ http://localhost:5173/?mockReset
 ```
 
 **Cenários de negócio (painel):** pagamento confirmado ou recusado, conexão da carteira
-aceita ou recusada, expirar as sessões ativas, derrubar e restabelecer o tempo real.
+aceita ou recusada, login social autorizado ou negado no provedor, expirar as sessões ativas,
+derrubar e restabelecer o tempo real.
 
 **Fluxos de falha do checkout (passo a passo):**
 

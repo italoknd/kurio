@@ -96,6 +96,17 @@ export default function MockPanel() {
             onChange={(value) => mockControls.setConfig({ walletConnection: value as 'aceitar' | 'recusar' })}
           />
 
+          <ChoiceGroup
+            legend="Login social (Google/Facebook)"
+            name="social"
+            value={config.socialLogin}
+            options={[
+              ['aceitar', 'Autorizar'],
+              ['recusar', 'Negar acesso'],
+            ]}
+            onChange={(value) => mockControls.setConfig({ socialLogin: value as 'aceitar' | 'recusar' })}
+          />
+
           <div className="space-y-2">
             <p className="text-sm font-bold">Sessão</p>
             <Button variant="outline" size="sm" onClick={() => mockControls.session.expireAll()}>

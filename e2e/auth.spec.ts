@@ -139,3 +139,51 @@ test.describe('conta e sessão', () => {
     await expect(app).not.toHaveURL(/auth=/)
   })
 })
+
+test.describe('login social (simulado)', () => {
+  test('visitante finaliza a compra entrando com Google: conta criada e carrinho preservado', async ({ page }) => {
+    await page.goto('/nft/golden-beat-207')
+    await waitForMocks(page)
+    await page.getByRole('button', { name: /^Comprar/ }).locator('visible=true').click()
+    await expect(page).toHaveURL(/\/carrinho$/)
+    await page.getByRole('button', { name: 'Conectar e finalizar' }).locator('visible=true').click()
+    await expect(page).toHaveURL(/\/entrar\?redirect=%2Fpagamento/)
+    await waitForMocks(page)
+
+    await page.getByRole('button', { name: 'Continuar com Google' }).click()
+    const consent = page.getByRole('dialog', { name: 'Continuar com Google' })
+    await expect(consent).toBeVisible()
+    await expect(consent.getByRole('textbox', { name: 'E-mail da conta Google' })).toHaveValue('colecionador.google@exemplo.com')
+    await consent.getByRole('button', { name: 'Autorizar e continuar' }).click()
+
+    // Volta ao pagamento autenticado, com o item do visitante; conta nova ainda sem carteira.
+    await expect(page).toHaveURL(atPath('/pagamento'))
+    await expect(page.getByText('Olá, Colecionador Google!')).toBeVisible()
+    await expect(page.getByText('Golden Beat #207').first()).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Cadastrar carteira' })).toBeVisible()
+  })
+
+  test('com o e-mail de uma conta existente, entra nela', async ({ page, isMobile }) => {
+    await page.goto('/entrar')
+    await waitForMocks(page)
+    await page.getByRole('button', { name: 'Continuar com Facebook' }).click()
+    const consent = page.getByRole('dialog', { name: 'Continuar com Facebook' })
+    await consent.getByRole('textbox', { name: 'E-mail da conta Facebook' }).fill('ana@kurio.dev')
+    await consent.getByRole('button', { name: 'Autorizar e continuar' }).click()
+    await expectSignedIn(page, isMobile, 'Ana Ribeiro')
+  })
+
+  test('provedor nega o acesso: erro exibido e nenhuma sessão criada', async ({ page }) => {
+    await page.goto('/entrar')
+    await waitForMocks(page)
+    await page.evaluate(() => window.__kurioMocks!.setConfig({ socialLogin: 'recusar' }))
+    await page.getByRole('button', { name: 'Continuar com Google' }).click()
+    const consent = page.getByRole('dialog', { name: 'Continuar com Google' })
+    await consent.getByRole('button', { name: 'Autorizar e continuar' }).click()
+    await expect(consent.getByRole('alert')).toHaveText('O acesso foi negado no Google.')
+    expect(await page.evaluate(() => localStorage.getItem('kurio:session-token'))).toBeNull()
+
+    await consent.getByRole('button', { name: 'Cancelar' }).click()
+    await expect(consent).toBeHidden()
+  })
+})

@@ -1,6 +1,5 @@
 import { useForm } from 'react-hook-form'
 import { TextField } from '@/components/forms/text-field'
-import { FacebookLogo, GoogleLogo } from '@/components/icons/social-login-icons'
 import { Button } from '@/components/ui/button'
 import { loginSchema, registerSchema, type LoginValues, type RegisterValues } from '@/features/auth/schemas'
 import { useLogin, useRegister } from '@/features/auth/use-auth'
@@ -136,26 +135,5 @@ function FormAlert({ children }: { children: React.ReactNode }) {
     <p role="alert" className="rounded-md border border-destructive/60 bg-destructive/10 px-3 py-2 text-sm text-destructive">
       {children}
     </p>
-  )
-}
-
-/** "Ou continue com" + botões sociais (fora do escopo: avisam indisponibilidade). */
-export function SocialLogin() {
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-3 text-sm" role="presentation">
-        <span className="h-px flex-1 bg-border" />
-        Ou continue com
-        <span className="h-px flex-1 bg-border" />
-      </div>
-      <Button variant="outline" className="w-full border-border text-sm font-medium text-muted-foreground" onClick={() => notifyUnavailable('O login com Google')}>
-        <GoogleLogo />
-        Continuar com Google
-      </Button>
-      <Button variant="outline" className="w-full border-border text-sm font-medium text-muted-foreground" onClick={() => notifyUnavailable('O login com Facebook')}>
-        <FacebookLogo />
-        Continuar com Facebook
-      </Button>
-    </div>
   )
 }
