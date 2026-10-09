@@ -5,6 +5,8 @@
  *
  * Uso: npm run audit:lighthouse            (gera o build antes)
  *      npm run audit:lighthouse -- --assert  (falha se alguma mediana ficar abaixo da meta)
+ *      node scripts/lighthouse.mjs --url https://kurio-ochre.vercel.app  (mede um deploy;
+ *        relatórios com prefixo "deploy-" e resumo em summary-deploy.*)
  */
 import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -16,7 +18,10 @@ import config from './lighthouse.config.mjs'
 import { startStaticServer } from './static-server.mjs'
 
 const assert = process.argv.includes('--assert')
-const baseUrl = `http://localhost:${config.port}`
+const urlIndex = process.argv.indexOf('--url')
+const externalUrl = urlIndex > -1 ? process.argv[urlIndex + 1].replace(/\/$/, '') : null
+const baseUrl = externalUrl ?? `http://localhost:${config.port}`
+const prefix = externalUrl ? 'deploy-' : ''
 const CATEGORIES = Object.keys(config.targets)
 
 function median(values) {
@@ -38,7 +43,7 @@ async function audit(url, formFactor, port) {
 }
 
 async function main() {
-  const server = await startStaticServer('dist', config.port)
+  const server = externalUrl ? null : await startStaticServer('dist', config.port)
   const summary = []
   let chrome
   try {
@@ -53,7 +58,7 @@ async function main() {
         const runs = []
         for (let run = 1; run <= config.runs; run++) {
           const result = await audit(`${baseUrl}${page.path}`, formFactor, chrome.port)
-          const base = join(config.outputDir, `${page.name}-${formFactor}-${run}`)
+          const base = join(config.outputDir, `${prefix}${page.name}-${formFactor}-${run}`)
           await writeFile(`${base}.html`, result.reports[0])
           await writeFile(`${base}.json`, result.reports[1])
           runs.push(result)
@@ -76,8 +81,8 @@ async function main() {
     }
   } finally {
     await chrome?.kill()
-    server.closeAllConnections()
-    server.close()
+    server?.closeAllConnections()
+    server?.close()
   }
 
   const failures = summary.flatMap((row) =>
@@ -86,7 +91,7 @@ async function main() {
     ),
   )
   const lines = [
-    '# Lighthouse — mediana de ' + config.runs + ' medições',
+    `# Lighthouse — ${baseUrl} — mediana de ${config.runs} medições`,
     '',
     `| Página | Formato | ${CATEGORIES.join(' | ')} | LCP | CLS | TBT |`,
     `| --- | --- | ${CATEGORIES.map(() => '---').join(' | ')} | --- | --- | --- |`,
@@ -98,8 +103,8 @@ async function main() {
     failures.length ? `Abaixo da meta: ${failures.join('; ')}` : 'Todas as medianas atingem as metas.',
     '',
   ]
-  await writeFile(join(config.outputDir, 'summary.json'), JSON.stringify({ targets: config.targets, summary }, null, 2))
-  await writeFile(join(config.outputDir, 'summary.md'), lines.join('\n'))
+  await writeFile(join(config.outputDir, `summary${externalUrl ? '-deploy' : ''}.json`), JSON.stringify({ targets: config.targets, summary }, null, 2))
+  await writeFile(join(config.outputDir, `summary${externalUrl ? '-deploy' : ''}.md`), lines.join('\n'))
   console.log('\n' + lines.join('\n'))
   if (assert && failures.length) process.exit(1)
 }

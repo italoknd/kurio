@@ -17,7 +17,7 @@ encontrados, como validar e os commits correspondentes.
 | 6 | Tempo real | Concluída |
 | 7 | Checkout e pedido | Concluída |
 | 8 | Perfil e carteiras | Concluída |
-| 9 | Testes, Lighthouse, deploy e documentação final | Pendente |
+| 9 | Testes, Lighthouse, deploy e documentação final | Concluída |
 
 Requisitos que faltam, por etapa, e pendências técnicas: [docs/PROXIMOS-PASSOS.md](PROXIMOS-PASSOS.md).
 
@@ -447,3 +447,25 @@ preparação do deploy.
 **Pendente:** deploy público (requer a conta da Vercel do autor).
 
 **Commit:** `990bf77`.
+
+---
+
+## Etapa 9 — Qualidade e entrega (parte 2: deploy)
+
+**Objetivo:** publicar a aplicação e validar o deploy.
+
+**Entregue:**
+- Deploy público na Vercel: [kurio-ochre.vercel.app](https://kurio-ochre.vercel.app) (feito pelo autor com o
+  `vercel.json` do repositório).
+- **Verificação automatizada do deploy:** `e2e/deploy.spec.ts` (`BASE_URL=<url> npm run
+  test:deploy`) — acesso direto e refresh em rotas internas, 404, tempo real (mudança de preço
+  chega ao carrinho) e compra completa até o recibo, desktop e mobile. O `playwright.config.ts`
+  aceita `BASE_URL` para rodar contra uma URL externa, sem servidor local.
+- **Lighthouse no deploy:** `node scripts/lighthouse.mjs --url <url>`; resumo em
+  `reports/lighthouse/summary-deploy.md`. Todas as metas atingidas: performance 90/100
+  (início mobile/desktop) e 92/99 (detalhe), acessibilidade, boas práticas e SEO 100.
+
+**Validação:** 16 verificações de fumaça passando contra o deploy; `npm run build`,
+`npm run lint`.
+
+**Commit:** (preenchido no próximo commit).

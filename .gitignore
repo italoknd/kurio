@@ -36,3 +36,5 @@ dist-ssr
 /reports/lighthouse/*
 !/reports/lighthouse/summary.md
 !/reports/lighthouse/summary.json
+!/reports/lighthouse/summary-deploy.md
+!/reports/lighthouse/summary-deploy.json

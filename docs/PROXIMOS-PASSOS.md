@@ -4,8 +4,9 @@ Checklist vivo do que falta para concluir o desafio, organizado pelas etapas do 
 cruzado com o enunciado ([docs/DESAFIO.md](DESAFIO.md)). O histórico do que já foi feito
 está em [docs/PROGRESSO.md](PROGRESSO.md).
 
-**Situação em 08/10/2026:** etapas 0 a 8 concluídas; etapa 9 quase concluída (falta o deploy
-público; performance mobile do Lighthouse abaixo da meta).
+**Situação em 09/10/2026:** todas as etapas (0 a 9) concluídas. Deploy público em
+[kurio-ochre.vercel.app](https://kurio-ochre.vercel.app), com todas as metas do Lighthouse atingidas. Restam
+apenas as pendências técnicas abaixo.
 
 Legenda: ✅ feito · 🟡 parcial · ⬜ pendente
 
@@ -89,7 +90,7 @@ para tablet e mobile). Detalhes em [PROGRESSO.md](PROGRESSO.md#etapa-8--perfil-e
 | Versões mobile e tablet | ✅ | Formulários em uma coluna no mobile |
 | Testes E2E (§9, item 8) | ✅ | `e2e/profile.spec.ts` |
 
-## Etapa 9 — Qualidade, entrega e documentação final 🟡
+## Etapa 9 — Qualidade, entrega e documentação final ✅
 
 | Requisito (enunciado §8–§12) | Status | Observação |
 | --- | --- | --- |
@@ -97,9 +98,9 @@ para tablet e mobile). Detalhes em [PROGRESSO.md](PROGRESSO.md#etapa-8--perfil-e
 | Regressão visual (início, detalhe, carrinho, pagamento) com baselines versionadas | ✅ | `npm run test:visual` |
 | Controle de relógio, latência e disparo de eventos nos testes sensíveis a tempo | ✅ | Eventos e conclusão de pedidos disparados pelos testes |
 | Lighthouse em início e detalhe, mobile e desktop, 3 medições, mediana | ✅ | `npm run audit:lighthouse` |
-| Metas: Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO ≥ 90 | 🟡 | Tudo atingido exceto performance mobile (68–88); ver README |
+| Metas: Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO ≥ 90 | ✅ | No deploy: performance 90–100, demais 100 (local: mobile 68–88) |
 | Revisão de acessibilidade (teclado, foco, contraste, zoom 200%, sem overflow) | ✅ | `e2e/a11y.spec.ts` |
-| Deploy público (Vercel) com mocks e tempo real funcionando | 🟡 | `vercel.json` pronto; falta publicar com a conta do autor |
+| Deploy público (Vercel) com mocks e tempo real funcionando | ✅ | [kurio-ochre.vercel.app](https://kurio-ochre.vercel.app); verificado com `npm run test:deploy` |
 | README final: setup, variáveis, credenciais, cenários, fluxos de falha | ✅ | |
 | ARCHITECTURE final: contratos, sessão, carrinho, cache, reconciliação REST × Socket.IO | ✅ | |
 | Scripts de auditoria (Lighthouse) no `package.json` | ✅ | |
@@ -122,10 +123,12 @@ para tablet e mobile). Detalhes em [PROGRESSO.md](PROGRESSO.md#etapa-8--perfil-e
 
 ## Pendências técnicas conhecidas
 
-- **Performance mobile do Lighthouse (68–88, meta 90):** limitada pelo LCP com a API simulada
-  no navegador (registro do service worker do MSW + latência simulada) e sensível à carga da
-  máquina (TBT simulado). Próximos passos possíveis: medir no deploy (HTTP/2, brotli, CDN),
-  reduzir o trabalho de renderização da página inicial, avaliar a latência do perfil "normal".
+- **Performance mobile medida localmente (68–88):** no deploy atinge a meta (90–92); localmente,
+  sem HTTP/2/brotli/CDN e com a máquina carregada, fica abaixo. Opcional: reduzir o trabalho de
+  renderização da página inicial.
+- **Arquivos gerados versionados:** o commit `d9ffa32` incluiu `.tanstack/tmp/*` (arquivos
+  temporários do plugin do router) e o `bun.lockb` (o projeto usa npm). Avaliar removê-los e
+  ignorar `.tanstack/`.
 - **Resolução das ilustrações:** limitadas ao export do Figma (434 px e 238 px); trocar se
   houver export em resolução maior.
 - **Lupa do header:** leva ao catálogo, mas não foca o campo de busca.
@@ -154,4 +157,4 @@ para tablet e mobile). Detalhes em [PROGRESSO.md](PROGRESSO.md#etapa-8--perfil-e
 2. ~~Etapa 6 (tempo real)~~ ✅
 3. ~~Etapa 7 (checkout e pedido)~~ ✅
 4. ~~Etapa 8 (perfil e carteiras)~~ ✅
-5. Etapa 9: falta o deploy público.
+5. ~~Etapa 9 (qualidade, deploy e documentação)~~ ✅

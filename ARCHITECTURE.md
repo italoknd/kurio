@@ -273,11 +273,11 @@ Medido com `npm run audit:lighthouse` (resumo em `reports/lighthouse/summary.md`
   `/assets`, fallback de SPA). Não usamos o `vite preview` nas medições porque extensões do
   editor (ex.: Console Ninja) injetam ~70 KB de script no HTML servido pelo Vite, o que
   derrubava Best Practices (charset fora dos primeiros 1024 bytes) e distorcia a performance.
-- **Limitação conhecida:** no perfil mobile do Lighthouse (4G lento simulado e CPU 4× mais
-  lenta), o LCP depende da cadeia "registro do service worker do MSW → resposta simulada da
-  API (latência de 150 ms do perfil normal) → imagem". Isso mantém a nota de performance
-  mobile abaixo de 90 mesmo com o restante otimizado; com um backend real, essa cadeia não
-  existe no navegador.
+- **Resultado:** no deploy (Vercel: HTTP/2, brotli e CDN) todas as metas são atingidas,
+  inclusive performance mobile (90 no início e 92 no detalhe). Medido localmente, o mobile fica
+  em 68–88: o LCP depende da cadeia "registro do service worker do MSW → resposta simulada da
+  API (latência de 150 ms do perfil normal) → imagem", e o tempo de bloqueio simulado
+  (CPU 4× mais lenta) varia com a carga da máquina.
 
 ## Regressão visual
 

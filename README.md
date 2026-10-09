@@ -1,5 +1,7 @@
 # Kurio — Marketplace de NFTs
 
+**Demonstração:** [kurio-ochre.vercel.app](https://kurio-ochre.vercel.app) (mocks e tempo real ativos; contas em [Credenciais fictícias](#credenciais-fictícias)).
+
 Solução do [Desafio Frontend da Jungle Gaming](docs/DESAFIO.md): marketplace de NFTs com
 descoberta, compra e conta do colecionador, rodando inteiramente sobre uma API simulada
 (MSW) com eventos em tempo real (Socket.IO).
@@ -40,6 +42,7 @@ A aplicação abre em `http://localhost:5173` com os mocks ativos.
 | `npm run test:e2e` | Testes Playwright (desktop e mobile) contra o build de produção |
 | `npm run test:e2e:ui` | Testes Playwright em modo interativo |
 | `npm run test:e2e:report` | Abre o último relatório HTML dos testes |
+| `npm run test:deploy` | Verificação do deploy público (use com `BASE_URL=<url>`) |
 | `npm run test:visual` | Regressão visual (início, detalhe, carrinho e pagamento; desktop e mobile) |
 | `npm run test:visual:update` | Regenera as baselines da regressão visual (`e2e/__screenshots__`) |
 | `npm run serve` | Serve o build com o servidor estático das auditorias (sem o `vite preview`) |
@@ -148,27 +151,36 @@ regenere com `npm run test:visual:update`).
 
 **Lighthouse** (`npm run audit:lighthouse`): início e detalhe, mobile e desktop, 3 medições
 por combinação, mediana. Configuração em `scripts/lighthouse.config.mjs`; relatórios HTML/JSON
-de cada medição em `reports/lighthouse/` e resumo versionado em
+de cada medição em `reports/lighthouse/`. Para medir um deploy:
+`node scripts/lighthouse.mjs --url <url>`.
+
+Resultado no deploy público ([reports/lighthouse/summary-deploy.md](reports/lighthouse/summary-deploy.md)):
+
+| Página | Formato | Performance | Accessibility | Best Practices | SEO | LCP | CLS | TBT |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Início | mobile | 90 | 100 | 100 | 100 | 2.94 s | 0.036 | 184 ms |
+| Início | desktop | 100 | 100 | 100 | 100 | 0.67 s | 0.005 | 0 ms |
+| Detalhe | mobile | 92 | 100 | 100 | 100 | 2.90 s | 0.039 | 106 ms |
+| Detalhe | desktop | 99 | 100 | 100 | 100 | 0.71 s | 0.042 | 16 ms |
+
+Todas as medianas atingem as metas (Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95,
+SEO ≥ 90). Medido localmente (`npm run audit:lighthouse`, sem HTTP/2, brotli nem CDN), o
+desktop fica em 98–99 e o mobile em 68–88, variando com a carga da máquina — detalhes em
+[ARCHITECTURE.md](ARCHITECTURE.md#performance-e-carregamento) e no resumo local
 [reports/lighthouse/summary.md](reports/lighthouse/summary.md).
-
-| Categoria | Meta | Desktop (início / detalhe) | Mobile (início / detalhe) |
-| --- | --- | --- | --- |
-| Performance | ≥ 90 | 98–99 / 98–99 | 68–83 / 72–88 |
-| Accessibility | ≥ 95 | 100 / 100 | 100 / 100 |
-| Best Practices | ≥ 95 | 100 / 100 | 100 / 100 |
-| SEO | ≥ 90 | 100 / 100 | 100 / 100 |
-
-Faixas observadas em execuções na mesma máquina. A performance mobile (4G lento simulado,
-CPU 4× mais lenta) varia com a carga da máquina — o tempo de bloqueio simulado multiplica cada
-tarefa longa observada — e fica abaixo da meta principalmente pelo LCP (≈ 3,6–4 s): os dados
-dependem do service worker do MSW e da latência simulada da API dentro do navegador. Detalhes
-e decisões em [ARCHITECTURE.md](ARCHITECTURE.md#performance-e-carregamento).
 
 > Rode as auditorias com `npm run audit:lighthouse` (ou sirva o build com `npm run serve`), e
 > não com o `vite preview`: extensões do editor podem injetar scripts no HTML servido pelo Vite.
 
 ## Deploy
 
-`vercel.json` configura o build (`npm run build`, saída `dist/`), o fallback de SPA (acesso
-direto e refresh em qualquer rota) e o cache dos assets. Os mocks (REST e Socket.IO) rodam no
-navegador, então o deploy estático já funciona sem backend.
+Publicado na Vercel em [kurio-ochre.vercel.app](https://kurio-ochre.vercel.app). O `vercel.json` configura o
+build (`npm run build`, saída `dist/`), o fallback de SPA (acesso direto e refresh em qualquer
+rota) e o cache dos assets. Os mocks (REST e Socket.IO) rodam no navegador, então o deploy
+estático funciona sem backend.
+
+Verificação do deploy (rotas internas, 404, tempo real e compra completa até o recibo):
+
+```bash
+BASE_URL=https://kurio-ochre.vercel.app npm run test:deploy
+```

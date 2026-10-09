@@ -1,6 +1,8 @@
 import { defineConfig, devices } from '@playwright/test'
 
 const PORT = 4173
+/** URL externa (ex.: o deploy na Vercel): `BASE_URL=https://... npx playwright test`. */
+const EXTERNAL_URL = process.env.BASE_URL
 
 /**
  * Testes E2E rodam contra o build de produção (com mocks MSW ativos).
@@ -17,7 +19,7 @@ export default defineConfig({
   // Com vários workers, a primeira renderização após um carregamento completo pode passar de 5 s.
   expect: { timeout: 10_000 },
   use: {
-    baseURL: `http://localhost:${PORT}`,
+    baseURL: EXTERNAL_URL ?? `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     locale: 'pt-BR',
@@ -33,7 +35,8 @@ export default defineConfig({
       use: { ...devices['Pixel 7'], viewport: { width: 390, height: 844 } },
     },
   ],
-  webServer: {
+  // Com BASE_URL, os testes rodam contra o endereço informado, sem servidor local.
+  webServer: EXTERNAL_URL ? undefined : {
     // Servidor estático próprio (não o `vite preview`): extensões do editor podem injetar
     // scripts no HTML servido pelo Vite e alterar o comportamento medido.
     command: `npm run build && node scripts/serve.mjs --port ${PORT}`,
