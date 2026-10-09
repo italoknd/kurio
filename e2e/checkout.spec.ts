@@ -17,8 +17,9 @@ function setMockConfig(page: Page, patch: MockConfigPatch) {
   return page.evaluate((value) => window.__kurioMocks!.setConfig(value), patch)
 }
 
+/** Pedidos criados durante o teste (as fixtures já trazem o histórico da Ana: `ord_seed_*`). */
 function orderCount(page: Page) {
-  return page.evaluate(() => window.__kurioMocks!.orders.list().length)
+  return page.evaluate(() => window.__kurioMocks!.orders.list().filter((order) => !order.id.startsWith('ord_seed_')).length)
 }
 
 function confirmPurchase(page: Page) {

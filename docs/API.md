@@ -155,6 +155,18 @@ só as quantidades compradas, gera `transaction` com hash e link do explorador) 
 `nickname`, `profileName`, `network`, `address` (0x + 40 hex), `secondaryAddress`
 (opcional), `type` (`metamask`/`walletconnect`/`coinbase`), `referralCode`, `email`, `ensName`.
 
+## Área do colecionador (autenticado)
+
+Áreas além do escopo do enunciado, sobre o mesmo banco simulado. A atividade usa
+`GET /orders` (com `?status=`).
+
+| Método | Rota | Corpo | Respostas |
+| --- | --- | --- | --- |
+| GET | `/offers` | — | 200 `{ coupons: CouponOffer[], priceDrops: NftSummary[] }` · 401 |
+| GET | `/downloads` | — | 200 `DownloadItem[]` (itens de pedidos confirmados) · 401 |
+| GET | `/support/tickets` | — | 200 `SupportTicket[]` (mais recentes primeiro) · 401 |
+| POST | `/support/tickets` | `{ category, subject, message, orderId \| null }` | 201 `SupportTicket` · 422 · 404 (pedido de outro usuário ou inexistente) · 401 |
+
 ## Eventos Socket.IO
 
 Conexão: `socket.io-client`, transporte WebSocket, `auth: { token }` no handshake.

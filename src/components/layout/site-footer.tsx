@@ -108,13 +108,29 @@ export function SiteFooter({ className }: { className?: string }) {
                 Meu perfil
               </Link>
             </li>
-            <FooterButton feature="A coleção do usuário">Minha coleção</FooterButton>
-            <FooterButton feature="A página de atividade">Atividade</FooterButton>
+            <li>
+              <Link to="/perfil/arquivos" className="hover:text-primary">
+                Minha coleção
+              </Link>
+            </li>
+            <li>
+              <Link to="/perfil/atividade" className="hover:text-primary">
+                Atividade
+              </Link>
+            </li>
             <FooterButton feature="O estúdio do criador">Estúdio do criador</FooterButton>
-            <FooterButton feature="A lista de interesse">Lista de interesse</FooterButton>
+            <li>
+              <Link to="/perfil/favoritos" className="hover:text-primary">
+                Lista de interesse
+              </Link>
+            </li>
           </FooterColumn>
           <FooterColumn title="Central de ajuda">
-            <FooterButton feature="A central de ajuda">Central de ajuda</FooterButton>
+            <li>
+              <Link to="/perfil/suporte" className="hover:text-primary">
+                Central de ajuda
+              </Link>
+            </li>
             <FooterButton feature="O guia de compra">Como comprar NFTs</FooterButton>
             <FooterButton feature="O guia de segurança">Carteira e segurança</FooterButton>
             <FooterButton feature="A política do mercado">Política do mercado</FooterButton>

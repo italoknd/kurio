@@ -1,4 +1,4 @@
-import { mulEth, percentOfEth, type EthAmount } from '@/lib/eth'
+import { addEth, mulEth, percentOfEth, type EthAmount } from '@/lib/eth'
 import {
   EDITION_LABELS,
   NFT_CATEGORIES,
@@ -7,7 +7,7 @@ import {
   type NftEdition,
   type NftNetwork,
 } from '@/types/nft'
-import type { CouponRecord, DbState, NftRecord, UserRecord, WalletRecord } from '@/mocks/db/types'
+import type { CouponRecord, DbState, NftRecord, OrderRecord, TicketRecord, UserRecord, WalletRecord } from '@/mocks/db/types'
 
 /**
  * Fixtures determinísticas: o mesmo cenário conhecido é restaurado em todo reset.
@@ -233,11 +233,118 @@ const WALLETS: WalletRecord[] = [
 const COUPONS: CouponRecord[] = [
   { code: 'KURIO10', description: '10% de desconto', percent: 10, expiresAt: '2099-12-31T23:59:59.000Z' },
   { code: 'LANCAMENTO', description: 'Desconto do lançamento (5%)', percent: 5, expiresAt: '2099-12-31T23:59:59.000Z' },
-  { code: 'EXPIRADO', description: 'Cupom de 2025', percent: 20, expiresAt: '2025-01-01T00:00:00.000Z' },
+  { code: 'EXPIRADO', description: 'Cupom de 2025', percent: 20, expiresAt: '2025-12-31T23:59:59.000Z' },
 ]
 
 /** Incrementar ao mudar as fixtures: estados persistidos antigos são substituídos. */
-export const FIXTURES_VERSION = 2
+export const FIXTURES_VERSION = 3
+
+interface SeedOrder {
+  id: string
+  status: 'confirmed' | 'rejected'
+  createdAt: string
+  items: { nftId: string; editionId: EditionId; quantity: number }[]
+  rejectionReason?: string
+}
+
+/**
+ * Histórico da Ana (atividade, arquivos baixados): pedidos já concluídos, montados a
+ * partir dos NFTs das fixtures, com os mesmos cálculos de um pedido real.
+ */
+const ANA_ORDERS: SeedOrder[] = [
+  {
+    id: 'ord_seed_ana_1',
+    status: 'confirmed',
+    createdAt: '2026-09-18T14:32:00.000Z',
+    items: [
+      { nftId: 'golden-signal-160', editionId: '1-50', quantity: 2 },
+      { nftId: 'cosmic-bloom-118', editionId: '1-10', quantity: 1 },
+    ],
+  },
+  {
+    id: 'ord_seed_ana_2',
+    status: 'rejected',
+    createdAt: '2026-09-26T19:05:00.000Z',
+    items: [{ nftId: 'neon-vessel-552', editionId: '1-10', quantity: 1 }],
+    rejectionReason: 'Pagamento recusado pela carteira.',
+  },
+]
+
+function buildSeedOrder(seed: SeedOrder, nfts: NftRecord[]): OrderRecord {
+  const wallet = WALLETS[0]
+  const items = seed.items.map(({ nftId, editionId, quantity }) => {
+    const nft = nfts.find((n) => n.id === nftId)!
+    const edition = nft.editions.find((e) => e.id === editionId)!
+    return {
+      nftId,
+      editionId,
+      name: nft.name,
+      tokenId: nft.tokenId,
+      image: nft.image,
+      imageAlt: nft.imageAlt,
+      editionLabel: edition.label,
+      quantity,
+      unitPrice: edition.price,
+      lineTotal: mulEth(edition.price, quantity),
+    }
+  })
+  const subtotal = addEth('0', ...items.map((item) => item.lineTotal))
+  const networkFee = NETWORK_FEES.ethereum
+  const updatedAt = new Date(new Date(seed.createdAt).getTime() + 6_000).toISOString()
+  const hash = `0x${seed.id.replace(/[^a-z0-9]/g, '').padEnd(64, 'a').slice(0, 64)}`
+  return {
+    id: seed.id,
+    status: seed.status,
+    createdAt: seed.createdAt,
+    updatedAt,
+    network: 'ethereum',
+    wallet: { id: wallet.id, label: 'MetaMask', address: wallet.address, type: wallet.type },
+    items,
+    subtotal,
+    discount: '0.00',
+    coupon: null,
+    networkFee,
+    total: addEth(subtotal, networkFee),
+    transaction:
+      seed.status === 'confirmed' ? { hash, explorerUrl: `https://etherscan.io/tx/${hash}`, confirmedAt: updatedAt } : null,
+    rejectionReason: seed.rejectionReason ?? null,
+    version: 2,
+    userId: 'usr_ana',
+    processAt: updatedAt,
+    outcome: seed.status === 'confirmed' ? 'aprovar' : 'recusar',
+    request: {
+      quoteId: `qt_seed_${seed.id}`,
+      network: 'ethereum',
+      walletId: wallet.id,
+      collector: {
+        displayName: 'Ana Ribeiro',
+        username: 'ana.coleciona',
+        profileName: 'ana.coleciona',
+        email: 'ana@kurio.dev',
+        ensName: 'ana',
+        referralCode: 'KURIO-ANA',
+        note: '',
+      },
+    },
+  }
+}
+
+const ANA_TICKETS: TicketRecord[] = [
+  {
+    id: 'tkt_seed_ana_1',
+    userId: 'usr_ana',
+    protocol: 'KUR-20260927-0001',
+    category: 'pedido',
+    subject: 'Pagamento recusado do Neon Vessel #552',
+    message: 'Tentei comprar a edição 1/10 do Neon Vessel #552 e o pagamento foi recusado. O valor foi cobrado?',
+    orderId: 'ord_seed_ana_2',
+    status: 'respondido',
+    createdAt: '2026-09-27T10:12:00.000Z',
+    reply:
+      'Olá, Ana! Pedidos recusados não geram cobrança: a carteira recusou a assinatura e nenhum valor foi transferido. Os itens continuam no seu carrinho para uma nova tentativa.',
+    repliedAt: '2026-09-27T13:40:00.000Z',
+  },
+]
 
 /** Estado inicial completo do banco simulado. */
 export function createSeedState(): DbState {
@@ -264,8 +371,9 @@ export function createSeedState(): DbState {
     ],
     wallets: structuredClone(WALLETS),
     coupons: structuredClone(COUPONS),
-    orders: [],
+    orders: ANA_ORDERS.map((order) => buildSeedOrder(order, nfts)),
     idempotency: [],
+    tickets: structuredClone(ANA_TICKETS),
     eventSeq: 0,
   }
 }

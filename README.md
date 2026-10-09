@@ -62,7 +62,7 @@ A aplicação abre em `http://localhost:5173` com os mocks ativos.
 
 | E-mail | Senha | Perfil |
 | --- | --- | --- |
-| `ana@kurio.dev` | `Colecione#1` | Carteiras principal e secundária, 2 favoritos e 3 itens no carrinho (valores do Figma) |
+| `ana@kurio.dev` | `Colecione#1` | Carteiras principal e secundária, 2 favoritos, 3 itens no carrinho (valores do Figma), histórico com 1 pedido confirmado e 1 recusado e 1 chamado de suporte respondido |
 | `bruno@kurio.dev` | `Colecione#2` | Conta sem carteiras, favoritos ou carrinho |
 
 **Login com Google/Facebook (simulado):** não há integração real com os provedores. O botão
@@ -70,6 +70,20 @@ abre a "tela do provedor" simulada com uma conta fictícia sugerida
 (`colecionador.google@exemplo.com`, por exemplo): ao autorizar, a API simulada cria a conta
 ou, se o e-mail já existir (ex.: `ana@kurio.dev`), entra nela. Contas criadas assim não têm
 senha utilizável — entram só pelo login social.
+
+## Área do colecionador
+
+Além de dados do perfil, carteiras e lista de interesse (frames 08 e 09), o menu do perfil traz
+áreas que o enunciado deixa fora do escopo, implementadas sobre a mesma API simulada:
+
+- **Atividade** (`/perfil/atividade`): histórico de pedidos com filtro de status na URL e
+  acesso ao pedido ou recibo.
+- **Ofertas** (`/perfil/ofertas`): cupons vigentes e expirados (copiar código, usar no
+  carrinho) e NFTs com preço reduzido.
+- **Arquivos baixados** (`/perfil/arquivos`): arte desbloqueável dos NFTs de pedidos
+  confirmados, com download do arquivo.
+- **Suporte** (`/perfil/suporte`): perguntas frequentes, abertura de chamado com validação
+  (assunto, pedido relacionado, título e mensagem) e histórico de chamados com protocolo.
 
 ## Dados simulados
 

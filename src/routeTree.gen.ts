@@ -18,8 +18,12 @@ import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as NftNftIdRouteImport } from './routes/nft.$nftId'
 import { Route as PedidosOrderIdRouteImport } from './routes/pedidos.$orderId'
 import { Route as PerfilIndexRouteImport } from './routes/perfil.index'
+import { Route as PerfilArquivosRouteImport } from './routes/perfil.arquivos'
+import { Route as PerfilAtividadeRouteImport } from './routes/perfil.atividade'
 import { Route as PerfilCarteirasRouteImport } from './routes/perfil.carteiras'
 import { Route as PerfilFavoritosRouteImport } from './routes/perfil.favoritos'
+import { Route as PerfilOfertasRouteImport } from './routes/perfil.ofertas'
+import { Route as PerfilSuporteRouteImport } from './routes/perfil.suporte'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -66,6 +70,16 @@ const PerfilIndexRoute = PerfilIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PerfilRoute,
 } as any)
+const PerfilArquivosRoute = PerfilArquivosRouteImport.update({
+  id: '/arquivos',
+  path: '/arquivos',
+  getParentRoute: () => PerfilRoute,
+} as any)
+const PerfilAtividadeRoute = PerfilAtividadeRouteImport.update({
+  id: '/atividade',
+  path: '/atividade',
+  getParentRoute: () => PerfilRoute,
+} as any)
 const PerfilCarteirasRoute = PerfilCarteirasRouteImport.update({
   id: '/carteiras',
   path: '/carteiras',
@@ -74,6 +88,16 @@ const PerfilCarteirasRoute = PerfilCarteirasRouteImport.update({
 const PerfilFavoritosRoute = PerfilFavoritosRouteImport.update({
   id: '/favoritos',
   path: '/favoritos',
+  getParentRoute: () => PerfilRoute,
+} as any)
+const PerfilOfertasRoute = PerfilOfertasRouteImport.update({
+  id: '/ofertas',
+  path: '/ofertas',
+  getParentRoute: () => PerfilRoute,
+} as any)
+const PerfilSuporteRoute = PerfilSuporteRouteImport.update({
+  id: '/suporte',
+  path: '/suporte',
   getParentRoute: () => PerfilRoute,
 } as any)
 
@@ -86,8 +110,12 @@ export interface FileRoutesByFullPath {
   '/perfil': typeof PerfilRouteWithChildren
   '/nft/$nftId': typeof NftNftIdRoute
   '/pedidos/$orderId': typeof PedidosOrderIdRoute
+  '/perfil/arquivos': typeof PerfilArquivosRoute
+  '/perfil/atividade': typeof PerfilAtividadeRoute
   '/perfil/carteiras': typeof PerfilCarteirasRoute
   '/perfil/favoritos': typeof PerfilFavoritosRoute
+  '/perfil/ofertas': typeof PerfilOfertasRoute
+  '/perfil/suporte': typeof PerfilSuporteRoute
   '/perfil/': typeof PerfilIndexRoute
 }
 export interface FileRoutesByTo {
@@ -98,8 +126,12 @@ export interface FileRoutesByTo {
   '/pagamento': typeof PagamentoRoute
   '/nft/$nftId': typeof NftNftIdRoute
   '/pedidos/$orderId': typeof PedidosOrderIdRoute
+  '/perfil/arquivos': typeof PerfilArquivosRoute
+  '/perfil/atividade': typeof PerfilAtividadeRoute
   '/perfil/carteiras': typeof PerfilCarteirasRoute
   '/perfil/favoritos': typeof PerfilFavoritosRoute
+  '/perfil/ofertas': typeof PerfilOfertasRoute
+  '/perfil/suporte': typeof PerfilSuporteRoute
   '/perfil': typeof PerfilIndexRoute
 }
 export interface FileRoutesById {
@@ -112,8 +144,12 @@ export interface FileRoutesById {
   '/perfil': typeof PerfilRouteWithChildren
   '/nft/$nftId': typeof NftNftIdRoute
   '/pedidos/$orderId': typeof PedidosOrderIdRoute
+  '/perfil/arquivos': typeof PerfilArquivosRoute
+  '/perfil/atividade': typeof PerfilAtividadeRoute
   '/perfil/carteiras': typeof PerfilCarteirasRoute
   '/perfil/favoritos': typeof PerfilFavoritosRoute
+  '/perfil/ofertas': typeof PerfilOfertasRoute
+  '/perfil/suporte': typeof PerfilSuporteRoute
   '/perfil/': typeof PerfilIndexRoute
 }
 export interface FileRouteTypes {
@@ -127,8 +163,12 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/nft/$nftId'
     | '/pedidos/$orderId'
+    | '/perfil/arquivos'
+    | '/perfil/atividade'
     | '/perfil/carteiras'
     | '/perfil/favoritos'
+    | '/perfil/ofertas'
+    | '/perfil/suporte'
     | '/perfil/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -139,8 +179,12 @@ export interface FileRouteTypes {
     | '/pagamento'
     | '/nft/$nftId'
     | '/pedidos/$orderId'
+    | '/perfil/arquivos'
+    | '/perfil/atividade'
     | '/perfil/carteiras'
     | '/perfil/favoritos'
+    | '/perfil/ofertas'
+    | '/perfil/suporte'
     | '/perfil'
   id:
     | '__root__'
@@ -152,8 +196,12 @@ export interface FileRouteTypes {
     | '/perfil'
     | '/nft/$nftId'
     | '/pedidos/$orderId'
+    | '/perfil/arquivos'
+    | '/perfil/atividade'
     | '/perfil/carteiras'
     | '/perfil/favoritos'
+    | '/perfil/ofertas'
+    | '/perfil/suporte'
     | '/perfil/'
   fileRoutesById: FileRoutesById
 }
@@ -233,6 +281,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PerfilIndexRouteImport
       parentRoute: typeof PerfilRoute
     }
+    '/perfil/arquivos': {
+      id: '/perfil/arquivos'
+      path: '/arquivos'
+      fullPath: '/perfil/arquivos'
+      preLoaderRoute: typeof PerfilArquivosRouteImport
+      parentRoute: typeof PerfilRoute
+    }
+    '/perfil/atividade': {
+      id: '/perfil/atividade'
+      path: '/atividade'
+      fullPath: '/perfil/atividade'
+      preLoaderRoute: typeof PerfilAtividadeRouteImport
+      parentRoute: typeof PerfilRoute
+    }
     '/perfil/carteiras': {
       id: '/perfil/carteiras'
       path: '/carteiras'
@@ -247,18 +309,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PerfilFavoritosRouteImport
       parentRoute: typeof PerfilRoute
     }
+    '/perfil/ofertas': {
+      id: '/perfil/ofertas'
+      path: '/ofertas'
+      fullPath: '/perfil/ofertas'
+      preLoaderRoute: typeof PerfilOfertasRouteImport
+      parentRoute: typeof PerfilRoute
+    }
+    '/perfil/suporte': {
+      id: '/perfil/suporte'
+      path: '/suporte'
+      fullPath: '/perfil/suporte'
+      preLoaderRoute: typeof PerfilSuporteRouteImport
+      parentRoute: typeof PerfilRoute
+    }
   }
 }
 
 interface PerfilRouteChildren {
+  PerfilArquivosRoute: typeof PerfilArquivosRoute
+  PerfilAtividadeRoute: typeof PerfilAtividadeRoute
   PerfilCarteirasRoute: typeof PerfilCarteirasRoute
   PerfilFavoritosRoute: typeof PerfilFavoritosRoute
+  PerfilOfertasRoute: typeof PerfilOfertasRoute
+  PerfilSuporteRoute: typeof PerfilSuporteRoute
   PerfilIndexRoute: typeof PerfilIndexRoute
 }
 
 const PerfilRouteChildren: PerfilRouteChildren = {
+  PerfilArquivosRoute: PerfilArquivosRoute,
+  PerfilAtividadeRoute: PerfilAtividadeRoute,
   PerfilCarteirasRoute: PerfilCarteirasRoute,
   PerfilFavoritosRoute: PerfilFavoritosRoute,
+  PerfilOfertasRoute: PerfilOfertasRoute,
+  PerfilSuporteRoute: PerfilSuporteRoute,
   PerfilIndexRoute: PerfilIndexRoute,
 }
 

@@ -2,7 +2,6 @@ import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
 import { Activity, CircleAlert, Download, Heart, LogOut, MapPin, Tag, User } from 'lucide-react'
 import { requireAuth } from '@/features/auth/guards'
 import { useSignOut } from '@/features/auth/use-auth'
-import { notifyUnavailable } from '@/lib/unavailable'
 
 /** Layout da área do colecionador (frames desktop-08-perfil e desktop-09-carteiras). */
 export const Route = createFileRoute('/perfil')({
@@ -14,15 +13,12 @@ export const Route = createFileRoute('/perfil')({
 const LINKS = [
   { to: '/perfil', label: 'Dados do perfil', Icon: User },
   { to: '/perfil/carteiras', label: 'Carteiras', Icon: MapPin },
+  { to: '/perfil/atividade', label: 'Atividade', Icon: Activity },
   { to: '/perfil/favoritos', label: 'Lista de interesse', Icon: Heart },
+  { to: '/perfil/ofertas', label: 'Ofertas', Icon: Tag },
+  { to: '/perfil/arquivos', label: 'Arquivos baixados', Icon: Download },
+  { to: '/perfil/suporte', label: 'Suporte', Icon: CircleAlert },
 ] as const
-
-const UNAVAILABLE = [
-  { label: 'Atividade', feature: 'A página de atividade', Icon: Activity },
-  { label: 'Ofertas', feature: 'A página de ofertas', Icon: Tag },
-  { label: 'Arquivos baixados', feature: 'A página de downloads', Icon: Download },
-  { label: 'Suporte', feature: 'O suporte', Icon: CircleAlert },
-]
 
 const itemClass =
   'relative flex h-11 w-full items-center gap-3 px-4 text-sm text-primary transition-colors hover:bg-surface-strong'
@@ -40,20 +36,12 @@ function ProfileLayout() {
               <li key={to}>
                 <Link
                   to={to}
-                  activeOptions={{ exact: true }}
+                  activeOptions={{ exact: true, includeSearch: false }}
                   className={`${itemClass} data-[status=active]:before:absolute data-[status=active]:before:inset-y-0 data-[status=active]:before:left-0 data-[status=active]:before:w-1.5 data-[status=active]:before:bg-primary`}
                 >
                   <Icon className="size-4" aria-hidden="true" />
                   {label}
                 </Link>
-              </li>
-            ))}
-            {UNAVAILABLE.map(({ label, feature, Icon }) => (
-              <li key={label}>
-                <button type="button" className={itemClass} onClick={() => notifyUnavailable(feature)}>
-                  <Icon className="size-4" aria-hidden="true" />
-                  {label}
-                </button>
               </li>
             ))}
           </ul>

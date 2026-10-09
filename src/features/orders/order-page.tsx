@@ -65,6 +65,7 @@ export function OrderPage({ orderId }: { orderId: string }) {
 function useStatusChange(order: Order | undefined) {
   const queryClient = useQueryClient()
   const { user } = useSession()
+  const userId = user?.id ?? null
   const previous = useRef<OrderStatus | null>(null)
 
   useEffect(() => {
@@ -75,12 +76,13 @@ function useStatusChange(order: Order | undefined) {
 
     if (order.status === 'confirmed') {
       toast.success('Pagamento confirmado! Seus NFTs estão na sua carteira.')
-      void queryClient.invalidateQueries({ queryKey: queryKeys.cart(user?.id ?? null) })
+      void queryClient.invalidateQueries({ queryKey: queryKeys.cart(userId) })
+      if (userId) void queryClient.invalidateQueries({ queryKey: queryKeys.user.downloads(userId) })
     } else {
       toast.error('O pagamento foi recusado. Seus itens continuam no carrinho.')
     }
     document.getElementById('pedido-titulo')?.focus()
-  }, [order, queryClient, user?.id])
+  }, [order, queryClient, userId])
 }
 
 function OrderStatusView({ order }: { order: Order }) {

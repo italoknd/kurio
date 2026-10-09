@@ -1,4 +1,5 @@
 import type { EthAmount } from '@/lib/eth'
+import type { SupportTicket } from '@/types/account'
 import type { User } from '@/types/auth'
 import type { EditionId, NftDetail } from '@/types/nft'
 import type { CreateOrderRequest, Order } from '@/types/order'
@@ -68,6 +69,10 @@ export interface IdempotencyRecord {
   orderId: string
 }
 
+export interface TicketRecord extends SupportTicket {
+  userId: string
+}
+
 export interface DbState {
   /** Versão das fixtures; estados salvos com outra versão são descartados. */
   schemaVersion: number
@@ -81,6 +86,8 @@ export interface DbState {
   coupons: CouponRecord[]
   orders: OrderRecord[]
   idempotency: IdempotencyRecord[]
+  /** Chamados de suporte (área extra do colecionador). */
+  tickets: TicketRecord[]
   /** Sequência dos eventos de tempo real (gera ids estáveis). */
   eventSeq: number
 }

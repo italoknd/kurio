@@ -246,7 +246,8 @@ test.describe('pedidos', () => {
 
     const recovered = await api(app, 'POST', '/orders', { token, headers, body })
     expect(recovered.status).toBe(200)
-    const orders = await api(app, 'GET', '/orders', { token })
+    // Só o pedido recuperado está pendente (o histórico das fixtures já está concluído).
+    const orders = await api(app, 'GET', '/orders?status=pending', { token })
     expect(orders.body).toHaveLength(1)
     expect(orders.body[0].id).toBe(recovered.body.id)
   })

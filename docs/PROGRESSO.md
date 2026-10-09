@@ -498,4 +498,35 @@ simulados" em todos os pontos da interface.
 
 **Validação:** `npm run build`, `npm run lint`, `npm run test:e2e`.
 
+**Commit:** `534afce`.
+
+---
+
+## Áreas extras do colecionador (atividade, ofertas, arquivos e suporte)
+
+**Objetivo:** dar conteúdo às seções do menu do perfil que exibiam "não disponível" (o
+enunciado as deixa fora do escopo; implementadas a pedido).
+
+**Entregue:**
+- **Atividade:** histórico de pedidos com filtro de status na URL, status (em processamento,
+  confirmado, recusado), total e acesso ao pedido/recibo.
+- **Ofertas:** cupons vigentes e expirados (copiar código, usar no carrinho) e NFTs com preço
+  reduzido.
+- **Arquivos baixados:** arte desbloqueável dos NFTs de pedidos confirmados, com download.
+- **Suporte:** perguntas frequentes, chamado com validação local e da API, pedido
+  relacionado opcional, protocolo e histórico persistente.
+- API simulada: `GET /offers`, `GET /downloads`, `GET/POST /support/tickets`; fixtures da Ana
+  com histórico (pedido confirmado, recusado e chamado respondido) — `FIXTURES_VERSION` 3.
+- Menu do perfil e links do rodapé (Minha coleção, Atividade, Lista de interesse, Central de
+  ajuda) apontando para as novas áreas.
+- Testes E2E: `e2e/account.spec.ts` (8 cenários × desktop e mobile); testes que contavam
+  todos os pedidos passaram a ignorar o histórico das fixtures.
+
+**Problemas encontrados:**
+- Nome acessível do link de download não começava pelo texto visível (WCAG 2.5.3) → rótulo
+  "Baixar arte (WebP): <NFT>, edição <x>".
+- Cupom "EXPIRADO" exibia 2024 no fuso de São Paulo → validade em 31/12/2025.
+
+**Validação:** `npm run build`, `npm run lint`, `npm run test:e2e`.
+
 **Commit:** (preenchido no próximo commit).

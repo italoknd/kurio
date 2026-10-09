@@ -342,9 +342,29 @@ devem ser regeneradas com `npm run test:visual:update`.
 - **Mobile do login/cadastro e do detalhe:** sem barra inferior (como nos frames); o detalhe
   usa a barra fixa de compra do frame mobile-02.
 
+## Áreas extras do colecionador (além do escopo)
+
+O enunciado exclui atividade, ofertas, downloads e suporte; elas foram implementadas a pedido,
+com o mesmo padrão das demais telas (dados só da API simulada, estados de carregamento, vazio
+e erro, testes E2E) e sem frame no Figma (seguem o layout da área do colecionador):
+
+- **Atividade:** `GET /orders`, filtro `status` na URL (`/perfil/atividade?status=recusados`);
+  atualizada por `order.updated` (invalidação das listas de pedidos).
+- **Ofertas:** `GET /offers` deriva cupons (com `active` pela validade) e NFTs com preço
+  anterior maior que o atual; "Usar no carrinho" aplica o cupom pela mesma mutation do
+  carrinho.
+- **Arquivos baixados:** `GET /downloads` lista os itens de pedidos confirmados (snapshot do
+  pedido); o arquivo é a própria arte do NFT (`download` com nome sugerido). Recarregado quando
+  um pedido é confirmado (evento ou tela do pedido).
+- **Suporte:** `POST/GET /support/tickets` com validação espelhada no formulário; pedido
+  relacionado só do próprio usuário (404 caso contrário). Não há resposta automática: o chamado
+  fica "Em análise"; o histórico da Ana traz um chamado já respondido.
+- **Fixtures:** a Ana tem um pedido confirmado e um recusado (`ord_seed_*`, montados com os
+  mesmos cálculos de um pedido real) e um chamado respondido; o Bruno não tem histórico.
+
 ## Ações fora do escopo
 
-Criadores, Aprenda, Diário da Cunhagem, newsletter, central de ajuda, atividade, ofertas,
-downloads, suporte e recuperação de senha exibem um aviso de indisponibilidade
-(`lib/unavailable.ts`) e nunca simulam sucesso. São páginas editoriais/de suporte excluídas
-pelo enunciado; a recuperação de senha dependeria de envio de e-mail, que não é simulado.
+Criadores, Aprenda, Diário da Cunhagem, newsletter, estúdio do criador, demais links
+editoriais do rodapé e recuperação de senha exibem um aviso de indisponibilidade
+(`lib/unavailable.ts`) e nunca simulam sucesso. A recuperação de senha dependeria de envio de
+e-mail, que não é simulado.

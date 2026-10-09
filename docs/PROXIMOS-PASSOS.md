@@ -6,7 +6,8 @@ está em [docs/PROGRESSO.md](PROGRESSO.md).
 
 **Situação em 09/10/2026:** todas as etapas (0 a 9) concluídas. Deploy público em
 [kurio-ochre.vercel.app](https://kurio-ochre.vercel.app), com todas as metas do Lighthouse atingidas. Restam
-apenas as pendências técnicas abaixo.
+apenas as pendências técnicas abaixo. Além do escopo, a área do colecionador ganhou atividade,
+ofertas, arquivos baixados e suporte.
 
 Legenda: ✅ feito · 🟡 parcial · ⬜ pendente
 
@@ -132,6 +133,9 @@ para tablet e mobile). Detalhes em [PROGRESSO.md](PROGRESSO.md#etapa-8--perfil-e
 - **Resolução das ilustrações:** limitadas ao export do Figma (434 px e 238 px); trocar se
   houver export em resolução maior.
 - **Recuperação de senha:** "Esqueceu a senha?" segue indisponível (dependeria de e-mail).
+- **Falha intermitente em `api-contracts` (status 0):** numa execução da suíte completa, o login
+  feito por `fetch` dentro do teste foi interrompido; passou em 51 repetições seguidas.
+  Acompanhar (provável navegação da página durante a chamada).
 - **Lupa do header:** leva ao catálogo, mas não foca o campo de busca.
 - **Lentidão dos testes em paralelo:** a primeira renderização após um carregamento completo
   passa de 5 s com muitos workers; `expect.timeout` global subiu para 10 s.

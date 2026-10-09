@@ -27,5 +27,8 @@ export const queryKeys = {
     wallets: (userId: string) => ['user', userId, 'wallets'] as const,
     orders: (userId: string, status?: OrderStatus) => ['user', userId, 'orders', status ?? 'all'] as const,
     order: (userId: string, orderId: string) => ['user', userId, 'order', orderId] as const,
+    offers: (userId: string) => ['user', userId, 'offers'] as const,
+    downloads: (userId: string) => ['user', userId, 'downloads'] as const,
+    tickets: (userId: string) => ['user', userId, 'tickets'] as const,
   },
 }

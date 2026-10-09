@@ -95,7 +95,11 @@ function applyOrder(queryClient: QueryClient, userId: string, event: OrderUpdate
   )
   void queryClient.invalidateQueries({ queryKey: ['user', userId, 'orders'] })
   // Confirmado: a API removeu do carrinho só os itens e quantidades comprados.
-  if (event.data.status === 'confirmed') void queryClient.invalidateQueries({ queryKey: queryKeys.cart(userId) })
+  if (event.data.status === 'confirmed') {
+    void queryClient.invalidateQueries({ queryKey: queryKeys.cart(userId) })
+    // A arte desbloqueável do pedido passa a aparecer em "Arquivos baixados".
+    void queryClient.invalidateQueries({ queryKey: queryKeys.user.downloads(userId) })
+  }
 }
 
 /**

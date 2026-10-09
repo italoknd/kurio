@@ -1,4 +1,5 @@
 import { HttpResponse } from 'msw'
+import { accountHandlers } from '@/mocks/handlers/account'
 import { authHandlers } from '@/mocks/handlers/auth'
 import { cartHandlers } from '@/mocks/handlers/cart'
 import { favoriteHandlers } from '@/mocks/handlers/favorites'
@@ -18,5 +19,6 @@ export const handlers = [
   ...orderHandlers,
   ...profileHandlers,
   ...walletHandlers,
+  ...accountHandlers,
   socketHandler,
 ]
