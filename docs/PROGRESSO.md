@@ -441,7 +441,9 @@ preparação do deploy.
 **Validação:** `npm run build`, `npm run lint`, `npm run test:e2e` (126 cenários),
 `npm run test:visual`, `npm run audit:lighthouse`.
 
-**Pendente:** deploy público (requer a conta da Vercel do autor), validação a partir de um
-clone limpo.
+**Clone limpo:** repositório clonado do GitHub em pasta nova — `npm ci`, `npm run build`,
+`npm run lint` e `npm run test:e2e` (126 cenários) passando.
 
-**Commit:** (preenchido no próximo commit).
+**Pendente:** deploy público (requer a conta da Vercel do autor).
+
+**Commit:** `990bf77`.

@@ -4,8 +4,8 @@ Checklist vivo do que falta para concluir o desafio, organizado pelas etapas do 
 cruzado com o enunciado ([docs/DESAFIO.md](DESAFIO.md)). O histórico do que já foi feito
 está em [docs/PROGRESSO.md](PROGRESSO.md).
 
-**Situação em 08/10/2026:** etapas 0 a 8 concluídas; etapa 9 quase concluída (faltam o deploy
-público e a validação em clone limpo; performance mobile do Lighthouse abaixo da meta).
+**Situação em 08/10/2026:** etapas 0 a 8 concluídas; etapa 9 quase concluída (falta o deploy
+público; performance mobile do Lighthouse abaixo da meta).
 
 Legenda: ✅ feito · 🟡 parcial · ⬜ pendente
 
@@ -103,7 +103,7 @@ para tablet e mobile). Detalhes em [PROGRESSO.md](PROGRESSO.md#etapa-8--perfil-e
 | README final: setup, variáveis, credenciais, cenários, fluxos de falha | ✅ | |
 | ARCHITECTURE final: contratos, sessão, carrinho, cache, reconciliação REST × Socket.IO | ✅ | |
 | Scripts de auditoria (Lighthouse) no `package.json` | ✅ | |
-| Execução a partir de um checkout limpo | ⬜ | Validar com clone novo antes de entregar |
+| Execução a partir de um checkout limpo | ✅ | Clone novo: `npm ci`, build, lint e 126 testes E2E passando |
 
 --- | --- | --- |
 | Testes E2E restantes (§9) | 🟡 | Feitos: itens 1–10, 12 e parte do 11. Falta: auditoria de teclado/foco em todas as telas (item 11) |
@@ -116,7 +116,7 @@ para tablet e mobile). Detalhes em [PROGRESSO.md](PROGRESSO.md#etapa-8--perfil-e
 | README final: setup, variáveis, credenciais, cenários, fluxos de falha | 🟡 | Setup, credenciais e cenários feitos; falta o passo a passo dos fluxos de falha |
 | ARCHITECTURE final: contratos, sessão, carrinho, cache, reconciliação REST × Socket.IO | 🟡 | Falta carrinho, checkout e reconciliação |
 | Scripts de auditoria (Lighthouse) no `package.json` | ⬜ | |
-| Execução a partir de um checkout limpo | ⬜ | Validar com clone novo antes de entregar |
+| Execução a partir de um checkout limpo | ✅ | Clone novo: `npm ci`, build, lint e 126 testes E2E passando |
 
 ---
 
@@ -154,4 +154,4 @@ para tablet e mobile). Detalhes em [PROGRESSO.md](PROGRESSO.md#etapa-8--perfil-e
 2. ~~Etapa 6 (tempo real)~~ ✅
 3. ~~Etapa 7 (checkout e pedido)~~ ✅
 4. ~~Etapa 8 (perfil e carteiras)~~ ✅
-5. Etapa 9: faltam o deploy público e a validação em clone limpo.
+5. Etapa 9: falta o deploy público.
