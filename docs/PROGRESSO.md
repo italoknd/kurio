@@ -396,4 +396,52 @@ secundária (frames desktop-08 e desktop-09), funcionando também em tablet e mo
 
 **Validação:** `npm run build`, `npm run lint`, `npm run test:e2e`.
 
+**Commit:** `d5cc368`.
+
+---
+
+## Etapa 9 — Qualidade e entrega (parte 1: performance, regressão visual e acessibilidade)
+
+**Objetivo:** auditoria Lighthouse versionada, regressão visual, auditoria de teclado/foco e
+preparação do deploy.
+
+**Entregue:**
+- **Lighthouse:** `scripts/lighthouse.mjs` + `scripts/lighthouse.config.mjs` (3 medições,
+  mediana, relatórios HTML/JSON, resumo em `reports/lighthouse/summary.md`, `--assert` para as
+  metas); scripts `audit:lighthouse` e `audit:lighthouse:assert`.
+- **Otimizações** (ver "Performance e carregamento" no `ARCHITECTURE.md`): meta description,
+  `robots.txt`, fonte servida localmente com preload, shell estático no HTML, app e mocks
+  avaliados após a primeira pintura com `modulepreload`, rede liberada só após o MSW
+  (`networkReady`), socket sob demanda, login/menu da conta/painel de cenários sob demanda,
+  stub do `tough-cookie` (mocks de 174 KB → 54 KB gzip), renderização inicial em
+  `startTransition`, `<main>` com altura mínima e rodapé com `content-visibility`.
+- **Resultados:** desktop 98–99 em performance; acessibilidade, boas práticas e SEO 100 em
+  todas as combinações; performance mobile 68–88 conforme a carga da máquina (abaixo da meta).
+- **Regressão visual:** `e2e/visual.spec.ts` com baselines versionadas (`npm run test:visual`).
+- **Acessibilidade:** `e2e/a11y.spec.ts` — "Pular para o conteúdo", foco preso e devolvido no
+  modal de login e na revisão do pedido, compra feita só pelo teclado e telas sem rolagem
+  horizontal em 390, 640 (zoom de 200%), 768 e 1440 px.
+- **Servidor estático** (`scripts/static-server.mjs`, `npm run serve`) usado pelo Playwright e
+  pelo Lighthouse no lugar do `vite preview`.
+- **Deploy:** `vercel.json` (fallback de SPA, cache dos assets).
+
+**Problemas encontrados:**
+- **CLS de 0,745 no detalhe (desktop):** troca tardia da fonte web + rodapé visível sob o
+  skeleton → fonte com preload e `<main>` com altura mínima.
+- **Best Practices 96 / script extra:** a extensão Console Ninja injeta ~70 KB no HTML servido
+  pelo `vite preview` (charset fora dos primeiros 1024 bytes) → servidor estático próprio.
+- **`tldts` + `tough-cookie` (~250 KB)** no chunk dos mocks, só para cookies que a API não usa
+  → stub via alias.
+- **Foco não voltava ao "Entrar"** ao fechar o modal de login (aberto por parâmetro de busca e
+  montado sob demanda) → o opener é guardado e recebe o foco de volta.
+- **Transbordo de 1 px em 640 px** na barra de abas/ordenação do catálogo → abas podem encolher.
+- Testes que dependiam de tempo (pedido pendente após refresh, reconexão, falha forçada
+  disputada com as consultas da página) → disparo explícito de eventos e esperas próprias.
+
+**Validação:** `npm run build`, `npm run lint`, `npm run test:e2e` (126 cenários),
+`npm run test:visual`, `npm run audit:lighthouse`.
+
+**Pendente:** deploy público (requer a conta da Vercel do autor), validação a partir de um
+clone limpo.
+
 **Commit:** (preenchido no próximo commit).

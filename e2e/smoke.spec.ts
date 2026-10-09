@@ -24,7 +24,8 @@ test.describe('fundação', () => {
     await expect(app.getByRole('status').filter({ hasText: 'Reconectando' })).toBeVisible()
 
     await app.evaluate(() => window.__kurioMocks!.socket.setAvailable(true))
-    await expect(app.getByText('Reconectando')).toBeHidden({ timeout: 10_000 })
+    // Backoff de reconexão do cliente: até ~7,5 s entre tentativas.
+    await expect(app.getByText('Reconectando')).toBeHidden({ timeout: 20_000 })
     await expect.poll(() => app.evaluate(() => window.__kurioMocks!.socket.connectedCount())).toBe(1)
   })
 

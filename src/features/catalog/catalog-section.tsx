@@ -59,7 +59,7 @@ export function CatalogSection({ search, onChange }: CatalogSectionProps) {
           <CatalogSearchBar search={search} onChange={(patch) => onChange(patch)} className="mb-6 hidden md:flex" />
 
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div role="tablist" aria-label="Seções do catálogo" className="flex gap-4 overflow-x-auto text-sm md:gap-5 md:text-base">
+            <div role="tablist" aria-label="Seções do catálogo" className="flex min-w-0 gap-4 overflow-x-auto text-sm md:gap-5 md:text-base">
               {TABS.map((tab) => (
                 <button
                   key={tab.id}
@@ -137,7 +137,7 @@ function CatalogGrid({ children, busy = false }: { children: React.ReactNode; bu
 function SortSelect({ value, onChange }: { value: NftSort; onChange: (value: NftSort) => void }) {
   const id = useId()
   return (
-    <div className="flex items-center gap-2 text-sm md:text-base">
+    <div className="flex shrink-0 items-center gap-2 text-sm md:text-base">
       <label htmlFor={id} className="shrink-0">
         Ordenar por:
       </label>

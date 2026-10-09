@@ -31,3 +31,8 @@ dist-ssr
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Relatórios do Lighthouse (o resumo é versionado)
+/reports/lighthouse/*
+!/reports/lighthouse/summary.md
+!/reports/lighthouse/summary.json

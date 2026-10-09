@@ -1,0 +1,206 @@
+{
+  "targets": {
+    "performance": 90,
+    "accessibility": 95,
+    "best-practices": 95,
+    "seo": 90
+  },
+  "summary": [
+    {
+      "page": "inicio",
+      "path": "/",
+      "formFactor": "mobile",
+      "median": {
+        "performance": 68,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "lcpMs": 3969,
+      "cls": 0,
+      "tbtMs": 763,
+      "runs": [
+        {
+          "scores": {
+            "performance": 56,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "lcpMs": 3947,
+          "cls": 0.036,
+          "tbtMs": 1643
+        },
+        {
+          "scores": {
+            "performance": 68,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "lcpMs": 3969,
+          "cls": 0,
+          "tbtMs": 763
+        },
+        {
+          "scores": {
+            "performance": 69,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "lcpMs": 3749,
+          "cls": 0.036,
+          "tbtMs": 725
+        }
+      ]
+    },
+    {
+      "page": "inicio",
+      "path": "/",
+      "formFactor": "desktop",
+      "median": {
+        "performance": 98,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "lcpMs": 1003,
+      "cls": 0.005,
+      "tbtMs": 25,
+      "runs": [
+        {
+          "scores": {
+            "performance": 98,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "lcpMs": 1003,
+          "cls": 0.005,
+          "tbtMs": 25
+        },
+        {
+          "scores": {
+            "performance": 98,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "lcpMs": 1025,
+          "cls": 0.005,
+          "tbtMs": 43
+        },
+        {
+          "scores": {
+            "performance": 98,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "lcpMs": 1037,
+          "cls": 0,
+          "tbtMs": 26
+        }
+      ]
+    },
+    {
+      "page": "detalhe",
+      "path": "/nft/emerald-ape-042",
+      "formFactor": "mobile",
+      "median": {
+        "performance": 72,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "lcpMs": 3700,
+      "cls": 0.039,
+      "tbtMs": 583,
+      "runs": [
+        {
+          "scores": {
+            "performance": 72,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "lcpMs": 3700,
+          "cls": 0.039,
+          "tbtMs": 583
+        },
+        {
+          "scores": {
+            "performance": 73,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "lcpMs": 3711,
+          "cls": 0,
+          "tbtMs": 642
+        },
+        {
+          "scores": {
+            "performance": 71,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "lcpMs": 3924,
+          "cls": 0.039,
+          "tbtMs": 580
+        }
+      ]
+    },
+    {
+      "page": "detalhe",
+      "path": "/nft/emerald-ape-042",
+      "formFactor": "desktop",
+      "median": {
+        "performance": 98,
+        "accessibility": 100,
+        "best-practices": 100,
+        "seo": 100
+      },
+      "lcpMs": 1036,
+      "cls": 0,
+      "tbtMs": 16,
+      "runs": [
+        {
+          "scores": {
+            "performance": 98,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "lcpMs": 1036,
+          "cls": 0,
+          "tbtMs": 16
+        },
+        {
+          "scores": {
+            "performance": 98,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "lcpMs": 1019,
+          "cls": 0.042,
+          "tbtMs": 22
+        },
+        {
+          "scores": {
+            "performance": 98,
+            "accessibility": 100,
+            "best-practices": 100,
+            "seo": 100
+          },
+          "lcpMs": 980,
+          "cls": 0.042,
+          "tbtMs": 6
+        }
+      ]
+    }
+  ]
+}

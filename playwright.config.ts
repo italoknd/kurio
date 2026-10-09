@@ -8,6 +8,8 @@ const PORT = 4173
  */
 export default defineConfig({
   testDir: './e2e',
+  // Baselines da regressão visual versionadas por projeto (desktop/mobile), sem sufixo de SO.
+  snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}-{projectName}{ext}',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
@@ -32,7 +34,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `npm run build && npm run preview -- --port ${PORT} --strictPort`,
+    // Servidor estático próprio (não o `vite preview`): extensões do editor podem injetar
+    // scripts no HTML servido pelo Vite e alterar o comportamento medido.
+    command: `npm run build && node scripts/serve.mjs --port ${PORT}`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

@@ -247,12 +247,54 @@ de validação espelham as da API para feedback imediato; erros por campo vindos
   então o `ws.link` usa apenas a origem; `ws.link` também não aceita `RegExp` (MSW 2.15).
 - Queda do servidor é simulada fechando as conexões e recusando novas até ser restabelecido.
 
+## Performance e carregamento
+
+Medido com `npm run audit:lighthouse` (resumo em `reports/lighthouse/summary.md`).
+
+- **Primeira pintura sem JavaScript:** o `index.html` traz um shell estático (fundo e marca),
+  a `meta description` e o preload da fonte. O `main.tsx` só avalia app e mocks depois da
+  primeira pintura; os dois chunks já começam a baixar com o HTML (`modulepreload`
+  injetado por um plugin no `vite.config.ts`).
+- **Mocks fora do caminho da interface:** a interface renderiza (shell, skeletons) enquanto
+  o MSW inicia. Toda requisição REST espera `networkReady` (interceptor do Axios) e o
+  `socket.io-client` só é importado depois dele (`lib/socket.ts`), porque o engine.io captura
+  `globalThis.WebSocket` ao ser avaliado. Assim nada escapa para a rede real.
+- **Bundle inicial menor:** modal de login (e o zod) e menu da conta carregados sob demanda;
+  painel de cenários montado só quando o navegador fica ocioso; `tough-cookie` (e o `tldts`,
+  ~250 KB de lista de sufixos públicos) trocado por um stub, pois a API simulada não usa
+  cookies — o chunk dos mocks caiu de 174 KB para 54 KB (gzip).
+- **Renderização inicial em `startTransition`:** o React cede a thread principal entre
+  partes da árvore (menos tempo de bloqueio).
+- **CLS:** fonte Roboto Mono servida de `/fonts` com preload (a troca tardia da fonte
+  deslocava o detalhe inteiro); `<main>` com altura mínima de uma tela, para o rodapé não
+  aparecer durante o carregamento e "pular" quando o conteúdo chega; rodapé com
+  `content-visibility: auto`.
+- **Servidor das medições e dos testes:** `scripts/static-server.mjs` (gzip, cache imutável em
+  `/assets`, fallback de SPA). Não usamos o `vite preview` nas medições porque extensões do
+  editor (ex.: Console Ninja) injetam ~70 KB de script no HTML servido pelo Vite, o que
+  derrubava Best Practices (charset fora dos primeiros 1024 bytes) e distorcia a performance.
+- **Limitação conhecida:** no perfil mobile do Lighthouse (4G lento simulado e CPU 4× mais
+  lenta), o LCP depende da cadeia "registro do service worker do MSW → resposta simulada da
+  API (latência de 150 ms do perfil normal) → imagem". Isso mantém a nota de performance
+  mobile abaixo de 90 mesmo com o restante otimizado; com um backend real, essa cadeia não
+  existe no navegador.
+
+## Regressão visual
+
+`e2e/visual.spec.ts` captura início, detalhe, carrinho e pagamento (desktop e mobile) com os
+dados fixos das fixtures. Antes da captura: rede ociosa, fontes prontas e todas as imagens
+carregadas (inclusive as lazy). O botão do painel de cenários e os toasts ficam ocultos
+(`e2e/visual.css`). Baselines em `e2e/__screenshots__/` sem sufixo de sistema operacional;
+foram geradas no Windows — em outro SO, a renderização de fontes pode diferir e as baselines
+devem ser regeneradas com `npm run test:visual:update`.
+
 ## Substituições de assets
 
 - Ilustrações dos NFTs recortadas do export PNG do Figma (sem acesso ao arquivo fonte):
   resolução limitada a 434 px (Emerald Ape) e 238 px (demais).
 - Ícones de redes sociais: traçados do lucide v0 (ISC), pois o lucide v1 removeu ícones de marca.
-- Fonte Roboto Mono servida localmente via `@fontsource-variable/roboto-mono`.
+- Fonte Roboto Mono (variável, OFL) copiada de `@fontsource-variable/roboto-mono` para
+  `public/fonts` (caminho estável para preload; licença em `public/fonts/LICENSE-roboto-mono.txt`).
 
 ## Desvios e adaptações em relação ao Figma
 

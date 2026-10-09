@@ -1,10 +1,13 @@
 import { Link, useRouterState } from '@tanstack/react-router'
 import { LogIn, Search, ShoppingCart } from 'lucide-react'
+import { lazy, Suspense } from 'react'
 import { useSession } from '@/features/auth/session'
 import { useCart } from '@/features/cart/use-cart'
-import { UserMenu } from '@/features/auth/user-menu'
 import { cn } from '@/lib/utils'
 import { notifyUnavailable } from '@/lib/unavailable'
+
+// Menu da conta (Radix DropdownMenu) só é baixado para quem está autenticado.
+const UserMenu = lazy(() => import('@/features/auth/user-menu').then((m) => ({ default: m.UserMenu })))
 
 const MARKET_PATHS = ['/nft', '/carrinho', '/pagamento']
 
@@ -52,7 +55,9 @@ export function SiteHeader() {
           {isPending ? (
             <span className="h-9 w-24" aria-hidden="true" />
           ) : user ? (
-            <UserMenu user={user} />
+            <Suspense fallback={<span className="h-9 w-24" aria-hidden="true" />}>
+              <UserMenu user={user} />
+            </Suspense>
           ) : (
             <Link
               to="."

@@ -1,6 +1,7 @@
 import axios, { AxiosError } from 'axios'
 import { credentials } from '@/lib/credentials'
 import { env } from '@/lib/env'
+import { networkReady } from '@/lib/network-ready'
 import type { ApiErrorBody, ApiErrorCode, ConflictReason } from '@/types/api'
 
 /** Tipos de falha normalizados para a UI, inclusive os que não têm resposta HTTP. */
@@ -54,7 +55,9 @@ export const http = axios.create({
   paramsSerializer: { indexes: null },
 })
 
-http.interceptors.request.use((config) => {
+http.interceptors.request.use(async (config) => {
+  // Com mocks, nenhuma requisição sai antes de o MSW estar interceptando.
+  await networkReady
   const token = credentials.getToken()
   if (token) config.headers.set('Authorization', `Bearer ${token}`)
   const guestCartId = credentials.getGuestCartId()

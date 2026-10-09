@@ -40,6 +40,11 @@ A aplicação abre em `http://localhost:5173` com os mocks ativos.
 | `npm run test:e2e` | Testes Playwright (desktop e mobile) contra o build de produção |
 | `npm run test:e2e:ui` | Testes Playwright em modo interativo |
 | `npm run test:e2e:report` | Abre o último relatório HTML dos testes |
+| `npm run test:visual` | Regressão visual (início, detalhe, carrinho e pagamento; desktop e mobile) |
+| `npm run test:visual:update` | Regenera as baselines da regressão visual (`e2e/__screenshots__`) |
+| `npm run serve` | Serve o build com o servidor estático das auditorias (sem o `vite preview`) |
+| `npm run audit:lighthouse` | Build + Lighthouse em início e detalhe (mobile e desktop, 3 medições, mediana) |
+| `npm run audit:lighthouse:assert` | Igual ao anterior, mas falha se alguma mediana ficar abaixo da meta |
 
 ## Variáveis de ambiente
 
@@ -128,3 +133,42 @@ aceita ou recusada, expirar as sessões ativas, derrubar e restabelecer o tempo 
 | `socket.recentEvents()` / `socket.replay(eventId)` | Lista e reenvia eventos (duplicatas) |
 
 Pedidos pendentes continuam sendo processados após um refresh da página.
+
+## Qualidade
+
+**Testes E2E** (`npm run test:e2e`): 126 cenários em Chromium (desktop 1440 px e mobile
+390 px), cobrindo os itens 1 a 12 do §9 do enunciado. Relatório HTML em `playwright-report/`
+e traces das falhas em `test-results/`. Cada teste parte de um contexto novo do navegador
+(dados simulados restaurados); eventos, latência e pagamentos são disparados pelos controles
+`window.__kurioMocks`.
+
+**Regressão visual** (`npm run test:visual`): início, detalhe, carrinho e pagamento, desktop
+e mobile, com baselines em `e2e/__screenshots__/` (geradas no Windows; em outro sistema,
+regenere com `npm run test:visual:update`).
+
+**Lighthouse** (`npm run audit:lighthouse`): início e detalhe, mobile e desktop, 3 medições
+por combinação, mediana. Configuração em `scripts/lighthouse.config.mjs`; relatórios HTML/JSON
+de cada medição em `reports/lighthouse/` e resumo versionado em
+[reports/lighthouse/summary.md](reports/lighthouse/summary.md).
+
+| Categoria | Meta | Desktop (início / detalhe) | Mobile (início / detalhe) |
+| --- | --- | --- | --- |
+| Performance | ≥ 90 | 98–99 / 98–99 | 68–83 / 72–88 |
+| Accessibility | ≥ 95 | 100 / 100 | 100 / 100 |
+| Best Practices | ≥ 95 | 100 / 100 | 100 / 100 |
+| SEO | ≥ 90 | 100 / 100 | 100 / 100 |
+
+Faixas observadas em execuções na mesma máquina. A performance mobile (4G lento simulado,
+CPU 4× mais lenta) varia com a carga da máquina — o tempo de bloqueio simulado multiplica cada
+tarefa longa observada — e fica abaixo da meta principalmente pelo LCP (≈ 3,6–4 s): os dados
+dependem do service worker do MSW e da latência simulada da API dentro do navegador. Detalhes
+e decisões em [ARCHITECTURE.md](ARCHITECTURE.md#performance-e-carregamento).
+
+> Rode as auditorias com `npm run audit:lighthouse` (ou sirva o build com `npm run serve`), e
+> não com o `vite preview`: extensões do editor podem injetar scripts no HTML servido pelo Vite.
+
+## Deploy
+
+`vercel.json` configura o build (`npm run build`, saída `dist/`), o fallback de SPA (acesso
+direto e refresh em qualquer rota) e o cache dos assets. Os mocks (REST e Socket.IO) rodam no
+navegador, então o deploy estático já funciona sem backend.

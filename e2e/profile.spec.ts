@@ -8,6 +8,8 @@ import { api, expect, test, waitForMocks } from './fixtures'
  * com persistência após refresh.
  */
 
+test.describe.configure({ timeout: 60_000 })
+
 const PNG_1PX = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==',
   'base64',

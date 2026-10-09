@@ -183,15 +183,20 @@ test.describe('checkout e pedido', () => {
 
   test('pedido pendente continua após refresh e é confirmado', async ({ page }) => {
     await openCheckout(page)
-    await setMockConfig(page, { orderDelayMs: 8000 })
+    // Atraso longo: a conclusão é disparada pelo teste depois do refresh (sem depender do relógio).
+    await setMockConfig(page, { orderDelayMs: 120_000 })
     const dialog = await openReview(page)
     await dialog.getByRole('button', { name: 'Confirmar e pagar' }).click()
     await expect(page.getByRole('heading', { name: 'Pedido em processamento' })).toBeVisible()
+    const orderId = new URL(page.url()).pathname.split('/').pop()!
 
     await page.reload()
     await waitForMocks(page)
     await expect(page.getByRole('heading', { name: 'Pedido em processamento' })).toBeVisible({ timeout: PAGE_LOAD_TIMEOUT })
-    await expect(page.getByRole('heading', { name: 'Seus NFTs agora estão na sua carteira' })).toBeVisible({ timeout: 20_000 })
+
+    await expect.poll(() => page.evaluate(() => window.__kurioMocks!.socket.connectedCount())).toBeGreaterThan(0)
+    await page.evaluate((id) => window.__kurioMocks!.orders.process(id), orderId)
+    await expect(page.getByRole('heading', { name: 'Seus NFTs agora estão na sua carteira' })).toBeVisible({ timeout: PAGE_LOAD_TIMEOUT })
     expect(await orderCount(page)).toBe(1)
   })
 

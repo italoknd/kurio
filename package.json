@@ -7,14 +7,18 @@
     "dev": "vite",
     "build": "vite build && tsc -b",
     "preview": "vite preview",
+    "serve": "node scripts/serve.mjs",
     "typecheck": "tsc -b",
     "lint": "oxlint",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "test:visual": "playwright test e2e/visual.spec.ts",
+    "test:visual:update": "playwright test e2e/visual.spec.ts --update-snapshots",
+    "audit:lighthouse": "npm run build && node scripts/lighthouse.mjs",
+    "audit:lighthouse:assert": "npm run build && node scripts/lighthouse.mjs --assert"
   },
   "dependencies": {
-    "@fontsource-variable/roboto-mono": "^5.3.0",
     "@tanstack/react-query": "^5.104.1",
     "@tanstack/react-router": "^1.170.41",
     "axios": "^1.20.0",
@@ -41,6 +45,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
+    "lighthouse": "^13.5.0",
     "msw": "^2.15.0",
     "oxlint": "^1.81.0",
     "shadcn": "^4.21.4",

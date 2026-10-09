@@ -1,13 +1,29 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Kurio</title>
+    <title>Kurio — Marketplace de NFTs</title>
+    <meta
+      name="description"
+      content="Kurio é um marketplace de NFTs para colecionadores: explore coleções de arte digital, compare edições e compre com sua carteira."
+    />
+    <meta name="theme-color" content="#140d0a" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Fonte principal pré-carregada: evita a troca tardia de fonte (CLS). -->
+    <link rel="preload" href="/fonts/roboto-mono-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Shell estático: primeira pintura (cor de fundo e marca) antes de o JavaScript carregar. -->
+    <style>
+      html { background: #140d0a; color: #f5f1eb; }
+      .boot-shell { box-sizing: border-box; width: 100%; max-width: 75rem; margin: 0 auto; padding: 0 1rem; }
+      .boot-shell span { display: flex; height: 68px; align-items: center; border-bottom: 1px solid #442c1a;
+        font: 700 0.875rem/1 'Roboto Mono Variable', ui-monospace, monospace; letter-spacing: 0.05em; }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="boot-shell" aria-hidden="true"><span>KURIO</span></div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

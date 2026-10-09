@@ -1,6 +1,6 @@
 import { WifiOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { socket } from '@/lib/socket'
+import { useSocket } from '@/lib/socket'
 
 type Status = 'idle' | 'connected' | 'reconnecting'
 
@@ -9,9 +9,11 @@ type Status = 'idle' | 'connected' | 'reconnecting'
  * conexão já foi estabelecida uma vez (evita alarme durante o carregamento).
  */
 export function ConnectionStatus() {
-  const [status, setStatus] = useState<Status>(socket.connected ? 'connected' : 'idle')
+  const socket = useSocket()
+  const [status, setStatus] = useState<Status>('idle')
 
   useEffect(() => {
+    if (!socket) return
     const onConnect = () => setStatus('connected')
     const onDisconnect = () => setStatus((current) => (current === 'idle' ? 'idle' : 'reconnecting'))
     socket.on('connect', onConnect)
@@ -20,7 +22,7 @@ export function ConnectionStatus() {
       socket.off('connect', onConnect)
       socket.off('disconnect', onDisconnect)
     }
-  }, [])
+  }, [socket])
 
   return (
     <div role="status" aria-live="polite" className="contents">

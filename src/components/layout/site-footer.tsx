@@ -45,7 +45,7 @@ export function SiteFooter({ className }: { className?: string }) {
   }
 
   return (
-    <footer className={cn('mt-16 pb-20 md:mt-24 md:pb-0', className)}>
+    <footer className={cn('mt-16 pb-20 [content-visibility:auto] [contain-intrinsic-size:auto_900px] md:mt-24 md:pb-0', className)}>
       <div className="container-site">
         <section
           aria-label="Destaques da Kurio"

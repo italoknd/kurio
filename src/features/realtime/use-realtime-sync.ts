@@ -6,8 +6,8 @@ import { queryKeys } from '@/api/query-keys'
 import { cartNotices } from '@/features/cart/cart-notices'
 import { createEventTracker } from '@/features/realtime/event-tracker'
 import { compareEth, formatEth } from '@/lib/eth'
-import { socket } from '@/lib/socket'
 import type { Cart, CartItem } from '@/types/cart'
+import type { Socket } from 'socket.io-client'
 import type { NftUpdatedData, NftUpdatedEvent, OrderUpdatedEvent } from '@/types/events'
 import type { FeaturedNfts, NftDetail, NftListResponse, NftSummary } from '@/types/nft'
 import type { Order } from '@/types/order'
@@ -106,12 +106,13 @@ function applyOrder(queryClient: QueryClient, userId: string, event: OrderUpdate
  *   eventos enviados durante a queda foram perdidos.
  * Duplicatas e eventos antigos são descartados pelo `EventTracker`.
  */
-export function useRealtimeSync(userId: string | null) {
+export function useRealtimeSync(socket: Socket | null, userId: string | null) {
   const queryClient = useQueryClient()
   const router = useRouter()
   const trackerRef = useRef(createEventTracker())
 
   useEffect(() => {
+    if (!socket) return
     const tracker = trackerRef.current
 
     const onNftUpdated = (event: NftUpdatedEvent) => {
@@ -145,5 +146,5 @@ export function useRealtimeSync(userId: string | null) {
       tracker.forget('order')
       cartNotices.clear()
     }
-  }, [queryClient, router, userId])
+  }, [socket, queryClient, router, userId])
 }

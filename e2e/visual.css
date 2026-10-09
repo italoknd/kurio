@@ -1,0 +1,6 @@
+/* Ocultos nas capturas da regressão visual: botão do painel de cenários (aparece quando a
+   página fica ociosa) e avisos temporários. */
+[data-mock-panel-trigger],
+[data-sonner-toaster] {
+  visibility: hidden !important;
+}

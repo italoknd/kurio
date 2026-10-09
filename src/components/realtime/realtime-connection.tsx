@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useSession } from '@/features/auth/session'
 import { useRealtimeSync } from '@/features/realtime/use-realtime-sync'
-import { socket } from '@/lib/socket'
+import { connectSocket, useSocket } from '@/lib/socket'
 
 /**
  * Mantém a conexão Socket.IO aberta e autenticada com o token da sessão atual.
@@ -12,16 +12,16 @@ import { socket } from '@/lib/socket'
 export function RealtimeConnection() {
   const { session, isPending } = useSession()
   const token = session?.token ?? null
-  useRealtimeSync(session?.user.id ?? null)
+  const socket = useSocket()
+  useRealtimeSync(socket, session?.user.id ?? null)
 
   useEffect(() => {
-    if (isPending) return
-    socket.auth = { token }
-    socket.connect()
+    if (!socket || isPending) return
+    connectSocket(socket, token)
     return () => {
       socket.disconnect()
     }
-  }, [token, isPending])
+  }, [socket, token, isPending])
 
   return null
 }

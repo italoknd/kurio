@@ -53,6 +53,9 @@ export const test = base.extend<{ app: Page }>({
   app: async ({ page }, use) => {
     await page.goto('/')
     await waitForMocks(page)
+    // As consultas da própria página saem logo após os mocks iniciarem: espera terminarem
+    // para não disputarem falhas forçadas (`failNext`) com o teste.
+    await page.waitForLoadState('networkidle')
     await use(page)
   },
 })

@@ -41,6 +41,7 @@ export default function MockPanel() {
           size="sm"
           className="fixed top-1/2 right-0 z-50 size-9 rounded-r-none bg-background p-0 md:top-auto md:right-auto md:bottom-4 md:left-4 md:size-auto md:rounded-md md:px-2.5"
           aria-label="Abrir painel de cenários dos mocks"
+          data-mock-panel-trigger
         >
           <FlaskConical aria-hidden="true" />
           <span className="hidden md:inline">Cenários</span>
