@@ -526,7 +526,11 @@ enunciado as deixa fora do escopo; implementadas a pedido).
 - Nome acessível do link de download não começava pelo texto visível (WCAG 2.5.3) → rótulo
   "Baixar arte (WebP): <NFT>, edição <x>".
 - Cupom "EXPIRADO" exibia 2024 no fuso de São Paulo → validade em 31/12/2025.
+- **Nome do arquivo baixado no deploy:** a Vercel envia `Content-Disposition: inline;
+  filename=...`, que prevalece sobre o atributo `download` (o arquivo saía como
+  `golden-beat.webp`) → o download gera o arquivo localmente (blob) com o nome sugerido.
+  Encontrado rodando `e2e/account.spec.ts` contra o deploy.
 
 **Validação:** `npm run build`, `npm run lint`, `npm run test:e2e`.
 
-**Commit:** (preenchido no próximo commit).
+**Commits:** `19d396d` e o seguinte (correção do download).

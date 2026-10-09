@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { Download } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useDownloads } from '@/features/account/queries'
@@ -47,7 +48,28 @@ export function DownloadsPage() {
   )
 }
 
+/**
+ * Baixa o arquivo com o nome sugerido. Hospedagens como a Vercel enviam
+ * `Content-Disposition: inline; filename=...`, que prevalece sobre o atributo `download`;
+ * gerar o arquivo localmente (blob) garante o nome em qualquer ambiente.
+ */
+async function saveFile(url: string, fileName: string) {
+  const response = await fetch(url)
+  if (!response.ok) throw new Error(`HTTP ${response.status}`)
+  const objectUrl = URL.createObjectURL(await response.blob())
+  const link = document.createElement('a')
+  link.href = objectUrl
+  link.download = fileName
+  link.click()
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 1000)
+}
+
 function DownloadRow({ item }: { item: DownloadItem }) {
+  function download(event: React.MouseEvent<HTMLAnchorElement>) {
+    event.preventDefault()
+    saveFile(item.image, item.fileName).catch(() => toast.error('Não foi possível baixar o arquivo. Tente novamente.'))
+  }
+
   return (
     <li className="flex gap-3 bg-card p-3">
       <img src={item.image} alt={item.imageAlt} width={88} height={88} loading="lazy" className="size-[88px] shrink-0 rounded-sm object-cover" />
@@ -65,6 +87,7 @@ function DownloadRow({ item }: { item: DownloadItem }) {
         <a
           href={item.image}
           download={item.fileName}
+          onClick={download}
           aria-label={`Baixar arte (${item.format}): ${item.name}, edição ${item.editionLabel}`}
           className="mt-auto inline-flex h-8 w-fit items-center gap-1.5 rounded-md bg-primary px-3 text-xs font-bold text-primary-foreground hover:bg-primary-hover"
         >
